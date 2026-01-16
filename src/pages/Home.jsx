@@ -16,7 +16,7 @@ const DEFAULT_PAGE_SIZE = 12;
 
 const Home = () => {
   const navigate = useNavigate();
-  const [allBooks, setAllBooks] = useState([]);
+  const [bookRecommendations, setBookRecommendations] = useState([]);
   const [genre1Books, setGenre1Books] = useState([]);
   const [genre2Books, setGenre2Books] = useState([]);
   const [genre3Books, setGenre3Books] = useState([]);
@@ -24,11 +24,11 @@ const Home = () => {
   const [topBooksLoading, setTopBooksLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showDiversity, setShowDiversity] = useState(false);
-  const [diversityBooks, setDiversityBooks] = useState([]);
-  const [diversityLoading, setDiversityLoading] = useState(false);
-  const [diversityError, setDiversityError] = useState(null);
-  const [anchorBookId, setAnchorBookId] = useState(null);
+  // const [showDiversity, setShowDiversity] = useState(false);
+  // const [diversityBooks, setDiversityBooks] = useState([]);
+  // const [diversityLoading, setDiversityLoading] = useState(false);
+  // const [diversityError, setDiversityError] = useState(null);
+  // const [anchorBookId, setAnchorBookId] = useState(null);
   
   const { user } = useAuth();
   const userId = user?.id;
@@ -65,22 +65,22 @@ const Home = () => {
           response = await getRecommendedBooks(userId, 12);
           console.log("Recommended books in Home:", response);
         } else {
-          response = await getBooks(0, 12);
+          return;
         }
 
         const books = response?.data || [];
-        setAllBooks(Array.isArray(books) ? books : []);
+        setBookRecommendations(Array.isArray(books) ? books : []);
       } catch (error) {
         console.error("Error loading books:", error);
         setError("Không thể tải danh sách sách. Vui lòng thử lại sau.");
-        setAllBooks([]);
+        setBookRecommendations([]);
       } finally {
         setLoading(false);
       }
     };
     loadAllBooks();
   }, [userId]);
-  console.log("All books:", allBooks);
+  console.log("All books:", bookRecommendations);
 
   // Load top books (most read) - separate from recommendations
   useEffect(() => {
@@ -102,72 +102,74 @@ const Home = () => {
   }, []);
 
   // Update anchor book when recommendations change
-  useEffect(() => {
-    if (allBooks.length > 0) {
-      setAnchorBookId(allBooks[0]?.id ?? null);
-    } else {
-      setAnchorBookId(null);
-    }
+  // useEffect(() => {
+  //   if (allBooks.length > 0) {
+  //     setAnchorBookId(allBooks[0]?.id ?? null);
+  //   } else {
+  //     setAnchorBookId(null);
+  //   }
 
-    setDiversityBooks([]);
-    setDiversityError(null);
-  }, [allBooks]);
+  //   setDiversityBooks([]);
+  //   setDiversityError(null);
+  // }, [allBooks]);
 
   // Load diversity books when toggled on
-  useEffect(() => {
-    let isActive = true;
+  // useEffect(() => {
+  //   let isActive = true;
 
-    if (!showDiversity) {
-      setDiversityLoading(false);
-      return () => {
-        isActive = false;
-      };
-    }
+  //   if (!showDiversity) {
+  //     setDiversityLoading(false);
+  //     return () => {
+  //       isActive = false;
+  //     };
+  //   }
 
-    const loadDiversity = async () => {
-      if (!showDiversity) return;
+  //   const loadDiversity = async () => {
+  //     if (!showDiversity) return;
 
-      if (!anchorBookId) {
-        setDiversityBooks([]);
-        setDiversityError("Không tìm thấy sách để đa dạng hóa.");
-        setDiversityLoading(false);
-        return;
-      }
+  //     if (!anchorBookId) {
+  //       setDiversityBooks([]);
+  //       setDiversityError("Không tìm thấy sách để đa dạng hóa.");
+  //       setDiversityLoading(false);
+  //       return;
+  //     }
 
-      setDiversityLoading(true);
-      setDiversityError(null);
+  //     setDiversityLoading(true);
+  //     setDiversityError(null);
 
-      try {
-        const response = await getDiversityBooks(anchorBookId, { limit: 6 });
-        if (!isActive) return;
+  //     try {
+  //       const response = await getDiversityBooks(anchorBookId, { limit: 6 });
+  //       if (!isActive) return;
 
-        const payload = response?.data || {};
-        const items = Array.isArray(payload.items) ? payload.items : [];
-        setDiversityBooks(items);
-      } catch (err) {
-        if (!isActive) return;
-        console.error("Error loading diversity books:", err);
-        setDiversityBooks([]);
-        setDiversityError("Không thể tải sách đa dạng. Vui lòng thử lại.");
-      } finally {
-        if (isActive) {
-          setDiversityLoading(false);
-        }
-      }
-    };
+  //       const payload = response?.data || {};
+  //       const items = Array.isArray(payload.items) ? payload.items : [];
+  //       setDiversityBooks(items);
+  //     } catch (err) {
+  //       if (!isActive) return;
+  //       console.error("Error loading diversity books:", err);
+  //       setDiversityBooks([]);
+  //       setDiversityError("Không thể tải sách đa dạng. Vui lòng thử lại.");
+  //     } finally {
+  //       if (isActive) {
+  //         setDiversityLoading(false);
+  //       }
+  //     }
+  //   };
 
-    loadDiversity();
+  //   loadDiversity();
 
-    return () => {
-      isActive = false;
-    };
-  }, [showDiversity, anchorBookId]);
+  //   return () => {
+  //     isActive = false;
+  //   };
+  // }, [showDiversity, anchorBookId]);
 
   // Load books by genre
   const loadGenreBooks = useCallback(async (genreId, setter) => {
     try {
       const response = await getBooksByGenre(genreId, { page: 0, size: DEFAULT_PAGE_SIZE });
-      const books = response?.data?.content || response?.content || [];
+      const books = response?.data || [];
+
+      console.log(`Books for genre ${genreId}:`, response, books);
       setter(Array.isArray(books) ? books : []);
     } catch {
       setter([]);
@@ -221,6 +223,10 @@ const Home = () => {
     }
   };
 
+  console.log("gerne1Books:", genre1Books);
+  console.log("gerne2Books:", genre2Books);
+  console.log("gerne3Books:", genre3Books);
+
   return (
     <MainLayout
       showHero={true}
@@ -264,53 +270,14 @@ const Home = () => {
             {/* <StatsSection /> */}
 
             {/* Recommended Books with Diversity toggle */}
-            {allBooks.length > 0 && (
+            {bookRecommendations.length > 0 && (
               <section className="mb-12">
                 <SectionHeader
                   title="SÁCH DÀNH CHO BẠN"
                   subtitle={false}
-                  extra={
-                    <button
-                      onClick={() => setShowDiversity((prev) => !prev)}
-                      className="relative flex items-center gap-2 rounded-full border border-blue-500 px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:border-blue-400 dark:text-blue-200 dark:hover:bg-blue-950/50"
-                    >
-                      {diversityLoading && showDiversity && (
-                        <span className="h-3 w-3 animate-spin rounded-full border-2 border-blue-500 border-t-transparent dark:border-blue-200"></span>
-                      )}
-                      {showDiversity ? "Thu gọn" : "Đa dạng hóa"}
-                    </button>
-                  }
                 />
-
                 <div className="mt-6">
-                  {showDiversity ? (
-                    <div className="grid gap-8 lg:grid-cols-2">
-                      <div>
-                        <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-100">Đề xuất dành riêng cho bạn</h3>
-                        <BookCarousel books={allBooks} showHeader={false} className="mb-0" />
-                      </div>
-                      <div>
-                        <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-gray-100">Khám phá đa dạng</h3>
-                        {diversityLoading ? (
-                          <div className="flex h-40 items-center justify-center rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
-                            <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent dark:border-blue-200"></div>
-                          </div>
-                        ) : diversityError ? (
-                          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-600 dark:border-red-700 dark:bg-red-900/30 dark:text-red-300">
-                            {diversityError}
-                          </div>
-                        ) : diversityBooks.length > 0 ? (
-                          <BookCarousel books={diversityBooks} showHeader={false} className="mb-0" />
-                        ) : (
-                          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600 dark:border-gray-700 dark:bg-gray-800/60 dark:text-gray-300">
-                            Chưa có sách đa dạng để hiển thị.
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ) : (
-                    <BookCarousel books={allBooks} showHeader={false} className="mb-0" />
-                  )}
+                    <BookCarousel books={bookRecommendations} showHeader={false} className="mb-0" />
                 </div>
               </section>
             )}
