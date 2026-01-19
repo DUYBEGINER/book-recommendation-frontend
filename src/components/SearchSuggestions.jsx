@@ -26,8 +26,8 @@ const SearchSuggestions = ({ suggestions, isLoading, onSelect, onClose }) => {
         <div className="py-2">
           {suggestions.map((book) => (
             <button
-              key={book.id}
-              onClick={() => handleBookClick(book.id)}
+              key={book.bookId}
+              onClick={() => handleBookClick(book.bookId)}
               className="w-full px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex items-start gap-3 text-left"
             >
               {/* Book Cover */}
@@ -43,13 +43,13 @@ const SearchSuggestions = ({ suggestions, isLoading, onSelect, onClose }) => {
                   {book.title}
                 </h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1">
-                  {book.authors?.map(a => a.name).join(', ') || 'Không rõ tác giả'}
+                  {book.authors?.map(a => a.authorName).join(', ') || 'Không rõ tác giả'}
                 </p>
                 {book.genres && book.genres.length > 0 && (
                   <div className="flex items-center gap-1 mt-1">
                     <BookOpen size={10} className="text-gray-500 dark:text-gray-400" />
                     <span className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
-                      {book.genres.map(g => g.name).join(', ')}
+                      {book.genres.map(g => g.genreName).join(', ')}
                     </span>
                   </div>
                 )}

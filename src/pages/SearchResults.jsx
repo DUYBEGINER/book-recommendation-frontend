@@ -9,7 +9,7 @@ const DEFAULT_PAGE_SIZE = 12;
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const keyword = searchParams.get("q") || "";
+  const keyword = searchParams.get("keyword") || "";
   
   const [bookList, setBookList] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,7 +27,7 @@ const SearchResults = () => {
 
       try {
         const response = await searchBooks(keyword, 0, DEFAULT_PAGE_SIZE);
-        const books = response?.data?.content || response?.content || [];
+        const books = response?.data || response?.content || [];
         setBookList(Array.isArray(books) ? books : []);
       } catch (err) {
         console.error("Failed to search books:", err);

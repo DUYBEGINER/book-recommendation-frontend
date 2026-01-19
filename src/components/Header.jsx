@@ -53,8 +53,8 @@ const Header = ({
     searchTimeoutRef.current = setTimeout(async () => {
       setIsLoadingSuggestions(true);
       try {
-        const response = await searchBooks(value.trim(), 0, 5); // Lấy 5 suggestions
-        const books = response?.data?.content || response?.content || [];
+        const response = await searchBooks(value.trim(), 0, 5); 
+        const books = response?.data || response?.content || [];
         const booksArray = Array.isArray(books) ? books : [];
         setSuggestions(booksArray);
         

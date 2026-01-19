@@ -152,7 +152,7 @@ const Home = () => {
   const handleSearchSubmit = (keyword) => {
     const trimmedKeyword = keyword.trim();
     if (trimmedKeyword) {
-      navigate(`/search?q=${encodeURIComponent(trimmedKeyword)}`);
+      navigate(`/search?keyword=${encodeURIComponent(trimmedKeyword)}`);
     }
   };
 
