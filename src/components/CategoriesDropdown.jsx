@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getGenres } from "../services/genreService";
+import { getAllGenres } from "../services/genreService";
 
 const CategoryDropdown = ({ onSelect }) => {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const CategoryDropdown = ({ onSelect }) => {
     const fetchGenres = async () => {
       setIsLoading(true);
       try {
-        const { genres } = await getGenres({ size: 100 });
+        const genres = await getAllGenres();
         setGenres(genres);
       } catch (error) {
         console.error("Không thể tải danh sách thể loại:", error);
@@ -76,11 +76,11 @@ const CategoryDropdown = ({ onSelect }) => {
                   <div key={columnIndex} className="space-y-2">
                     {column.map((item) => (
                       <button
-                        key={item.id}
+                        key={item.genreId}
                         onClick={() => handleCategoryClick(item)}
                         className="w-full text-left py-1 transition-colors text-sm text-gray-300 hover:text-blue-300"
                       >
-                        {item.name}
+                        {item.genreName}
                       </button>
                     ))}
                   </div>

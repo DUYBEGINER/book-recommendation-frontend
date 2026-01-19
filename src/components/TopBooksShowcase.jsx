@@ -66,7 +66,7 @@ const TopBooksShowcase = ({ books = [], title = "Top sách nổi bật" }) => {
             {book.title}
           </p>
           <span className="text-gray-600 dark:text-gray-300 line-clamp-1">
-            {book.authors?.map(a => a.name).join(", ") || "Không rõ tác giả"}
+            {book.authors?.map(a => a.authorName).join(", ") || "Không rõ tác giả"}
           </span>
         </div>
       </div>

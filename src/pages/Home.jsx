@@ -8,8 +8,8 @@ import FeaturesSection from "../components/FeaturesSection";
 import StatsSection from "../components/StatsSection";
 import ThemeToggle from "../components/ThemeToggle";
 import MainLayout from "../layout/MainLayout";
-import { getBooks, getBooksByGenre } from "../services/manageBookService";
-import { getRecommendedBooks, getDiversityBooks, getMostReadBooks } from "../services/bookService";
+import { getBooksByGenre } from "../services/manageBookService";
+import { getRecommendedBooks, getMostReadBooks } from "../services/bookService";
 import useAuth from "../hook/useAuth";
 
 const DEFAULT_PAGE_SIZE = 12;
@@ -24,12 +24,7 @@ const Home = () => {
   const [topBooksLoading, setTopBooksLoading] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // const [showDiversity, setShowDiversity] = useState(false);
-  // const [diversityBooks, setDiversityBooks] = useState([]);
-  // const [diversityLoading, setDiversityLoading] = useState(false);
-  // const [diversityError, setDiversityError] = useState(null);
-  // const [anchorBookId, setAnchorBookId] = useState(null);
-  
+
   const { user } = useAuth();
   const userId = user?.id;
   // Lazy loading states
@@ -88,7 +83,7 @@ const Home = () => {
       setTopBooksLoading(true);
       try {
         const response = await getMostReadBooks(0, 4);
-        const books = response?.data?.content || response?.content || [];
+        const books = response?.data || [];
         console.log("Top most read books:", books);
         setTopBooks(Array.isArray(books) ? books : []);
       } catch (error) {
@@ -100,68 +95,6 @@ const Home = () => {
     };
     loadTopBooks();
   }, []);
-
-  // Update anchor book when recommendations change
-  // useEffect(() => {
-  //   if (allBooks.length > 0) {
-  //     setAnchorBookId(allBooks[0]?.id ?? null);
-  //   } else {
-  //     setAnchorBookId(null);
-  //   }
-
-  //   setDiversityBooks([]);
-  //   setDiversityError(null);
-  // }, [allBooks]);
-
-  // Load diversity books when toggled on
-  // useEffect(() => {
-  //   let isActive = true;
-
-  //   if (!showDiversity) {
-  //     setDiversityLoading(false);
-  //     return () => {
-  //       isActive = false;
-  //     };
-  //   }
-
-  //   const loadDiversity = async () => {
-  //     if (!showDiversity) return;
-
-  //     if (!anchorBookId) {
-  //       setDiversityBooks([]);
-  //       setDiversityError("Không tìm thấy sách để đa dạng hóa.");
-  //       setDiversityLoading(false);
-  //       return;
-  //     }
-
-  //     setDiversityLoading(true);
-  //     setDiversityError(null);
-
-  //     try {
-  //       const response = await getDiversityBooks(anchorBookId, { limit: 6 });
-  //       if (!isActive) return;
-
-  //       const payload = response?.data || {};
-  //       const items = Array.isArray(payload.items) ? payload.items : [];
-  //       setDiversityBooks(items);
-  //     } catch (err) {
-  //       if (!isActive) return;
-  //       console.error("Error loading diversity books:", err);
-  //       setDiversityBooks([]);
-  //       setDiversityError("Không thể tải sách đa dạng. Vui lòng thử lại.");
-  //     } finally {
-  //       if (isActive) {
-  //         setDiversityLoading(false);
-  //       }
-  //     }
-  //   };
-
-  //   loadDiversity();
-
-  //   return () => {
-  //     isActive = false;
-  //   };
-  // }, [showDiversity, anchorBookId]);
 
   // Load books by genre
   const loadGenreBooks = useCallback(async (genreId, setter) => {
@@ -222,10 +155,6 @@ const Home = () => {
       navigate(`/search?q=${encodeURIComponent(trimmedKeyword)}`);
     }
   };
-
-  console.log("gerne1Books:", genre1Books);
-  console.log("gerne2Books:", genre2Books);
-  console.log("gerne3Books:", genre3Books);
 
   return (
     <MainLayout

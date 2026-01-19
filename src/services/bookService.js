@@ -67,3 +67,13 @@ export const getMostReadBooks = async (page = 0, size = 5) => {
     throw error;
   }
 };
+
+export const getPreviewBook = async (bookId) => {
+  try {
+    const response = await api.get(`/books/${bookId}/preview`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch book preview:", error);
+    throw error;
+  }
+}

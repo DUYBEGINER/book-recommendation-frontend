@@ -5,6 +5,7 @@ import api from "../config/ApiConfig.js";
  * @param {{ page?: number, size?: number, keyword?: string, sort?: string }} params
  * @returns {{ genres: Array, page: Object|null, message: string }}
  */
+
 export const getGenres = async ({ page = 0, size = 50, keyword = "", sort = "" } = {}) => {
   try {
     const params = { page, size };
@@ -26,6 +27,17 @@ export const getGenres = async ({ page = 0, size = 50, keyword = "", sort = "" }
     };
   } catch (error) {
     console.error("Error fetching genres:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getAllGenres = async () => {
+  try {
+    const response = await api.get("/genres");
+    console.log("All genres response:", response);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all genres:", error.response?.data || error.message);
     throw error;
   }
 };
