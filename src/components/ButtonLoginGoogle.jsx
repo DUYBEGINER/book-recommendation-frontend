@@ -19,7 +19,6 @@ function ButtonLoginGoogle(props) {
   }, []);
 
   
-
   return (
     <div>
       <div id="buttonDiv"></div>

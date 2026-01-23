@@ -2,7 +2,7 @@ import api from '../config/ApiConfig.js'
 
 export const getUser = async () => {
     try {
-        const response = await api.get("/users/profile");
+        const response = await api.get("/auth/profile");
         console.log("Get user profile response:", response);
         return response;
     } catch (error) {

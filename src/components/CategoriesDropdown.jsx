@@ -13,7 +13,7 @@ const CategoryDropdown = ({ onSelect }) => {
       return;
     }
 
-    navigate(`/category/${category.id}?name=${encodeURIComponent(category.name)}`);
+    navigate(`/category/${category.genreId}?name=${encodeURIComponent(category.name)}`);
   };
 
   useEffect(() => {

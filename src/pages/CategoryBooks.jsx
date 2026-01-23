@@ -29,8 +29,9 @@ const CategoryBooks = () => {
       setGenresLoading(true);
       try {
         const { genres } = await getGenres({ size: 200 });
+        console.log("Fetched genres:", genres);
         const matchedGenre = genres.find(
-          (genre) => String(genre.id) === String(categoryId),
+          (genre) => String(genre.genreId) === String(categoryId),
         );
 
         if (matchedGenre) {
@@ -66,7 +67,7 @@ const CategoryBooks = () => {
         size: BOOKS_PER_PAGE,
         sort: sortBy,
       });
-
+      console.log("Fetched books by category:", response);
       const data = response?.data || response;
       const content = data?.content || [];
       const total = data?.totalElements ?? content.length;
@@ -79,7 +80,7 @@ const CategoryBooks = () => {
         return;
       }
 
-      setBooks(Array.isArray(content) ? content : []);
+      setBooks(Array.isArray(data) ? data : []);
       setTotalBooks(total);
     } catch (error) {
       console.error("Không thể tải sách theo thể loại:", error);

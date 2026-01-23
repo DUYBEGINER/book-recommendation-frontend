@@ -139,10 +139,9 @@ function App() {
         />
         
         {/* Other Routes */}
-        {/* <Route path="/oauth2/success" element={<OAuthRedirect />} /> */}
+        <Route path="/oauth/callback" element={<OAuthRedirect />} />
         <Route path="/reader" element={<EpubCoreViewer />} />
         <Route path="/upload" element={<Upload />} />
-        <Route path="/login/success = " element={<OAuthRedirect />} />
       </Routes>
     </AuthProvider>
   )

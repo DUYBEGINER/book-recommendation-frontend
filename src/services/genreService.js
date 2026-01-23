@@ -19,7 +19,7 @@ export const getGenres = async ({ page = 0, size = 50, keyword = "", sort = "" }
     const response = await api.get("/books/genres", { params });
 
     const pageData = response.data ?? null;
-
+  
     return {
       genres: pageData?.content ?? [],
       page: pageData,
