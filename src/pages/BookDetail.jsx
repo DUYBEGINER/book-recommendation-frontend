@@ -16,7 +16,7 @@ import { getBooks } from '../services/manageBookService';
 import { useParams } from "react-router-dom";
 import { getBookDetail } from '../services/manageBookService';
 import { API_BASE_URL } from '../config/ApiConfig';
-import { getToken } from '../utils/storage';
+import { getAccessToken } from '../utils/storage';
 import { sendFeedback } from '../utils/feedbackHelper';
 
 // // Import all the new components
@@ -346,7 +346,7 @@ const BookDetail = () => {
 
     const endpointBase = API_BASE_URL.replace(/\/+$/, '');
     const downloadEndpoint = `${endpointBase}/books/${bookId}/download/${formatId}`;
-    const token = getToken();
+    const token = getAccessToken();
 
     try {
       const response = await axios.get(downloadEndpoint, {

@@ -4,37 +4,52 @@ import { useNavigate } from 'react-router-dom';
 import useAuth from '../../hook/useAuth.jsx';
 import { PATHS } from '../../constant/routePath.jsx';
 import ButtonLoginGoogle from '../../components/ButtonLoginGoogle.jsx';
-const BACKEND_URL = "http://localhost:8080";
-
+import { validateLogin } from '../../utils/validatorInput.js'; 
 import { useMessage } from '../../contexts/MessageProvider.jsx';
 
 const Login = ({ onModeChange, onClose }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const message = useMessage(); // Sử dụng global message
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
+
+
+  const message = useMessage(); // use global message
+
+  // Handle input changes
+  const onChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  }
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!email || !password) {
-      console.log('Email or password is empty');
-      message.warning('Vui lòng nhập đủ Email và Mật khẩu');
+    
+    const { email, password } = formData;
+    // Validate email and password
+    const validation = validateLogin({ email, password });
+    if (!validation.valid) {
+      message.warning('Vui lòng nhập đủ Email và Mật khẩu hợp lệ');
       setLoading(false);
       return;
     }
     setLoading(true);
-    
     try {
-      console.log('Attempting login with:', { email, password });
       const result = await login(email, password);
+      // Display success message
       message.success('Đăng nhập thành công!');
-      const role = result?.data?.role;
+      const role = result?.role;
       if (role && role.toUpperCase() === 'ADMIN') {
         navigate(PATHS.ADMIN.ROOT, { replace: true });
       }
@@ -47,21 +62,6 @@ const Login = ({ onModeChange, onClose }) => {
     }
   };
 
-
-  // Demo credentials helper
-  // const fillDemoCredentials = () => {
-  //   setEmail('user@example.com');
-  //   setPassword('password123');
-  // };
-
-
-const handleGoogleLogin = () => {
-  window.location.href = `${BACKEND_URL}/oauth2/authorization/google`;
-};
-
-const handleFacebookLogin = () => {
-  window.location.href = `${BACKEND_URL}/oauth2/authorization/facebook`;
-};
 
   return (
     <div className="w-full max-w-md">
@@ -77,9 +77,9 @@ const handleFacebookLogin = () => {
         <div>
           <input
             type="email"
-            value={email}
+            value={formData.email}
             name="email"
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={onChange}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
             placeholder="Email"
             autoComplete="email"
@@ -90,9 +90,9 @@ const handleFacebookLogin = () => {
         <div className="relative">
           <input
             type={showPassword ? 'text' : 'password'}
-            value={password}
+            value={formData.password}
             name="password"
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={onChange}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 pr-12"
             placeholder="Mật khẩu"
             autoComplete="password"

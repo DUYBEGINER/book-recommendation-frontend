@@ -1,79 +1,7 @@
-// // api.js
-// import axios from "axios";
-
-// const api = axios.create({
-//   baseURL: import.meta.env.VITE_API_URL,
-//   withCredentials: true, // để gửi refresh cookie
-// });
-
-// let accessToken = null;
-// let isRefreshing = false;
-// let queue = [];
-
-// export const setAccessToken = (token) => {
-//   accessToken = token;
-// };
-
-// api.interceptors.request.use((config) => {
-//   if (accessToken) {
-//     config.headers.Authorization = `Bearer ${accessToken}`;
-//   }
-//   return config;
-// });
-
-// function processQueue(error, token) {
-//   queue.forEach((p) => (error ? p.reject(error) : p.resolve(token)));
-//   queue = [];
-// }
-
-// api.interceptors.response.use(
-//   (res) => res,
-//   async (err) => {
-//     const original = err.config;
-
-//     // chỉ handle 401 một lần cho mỗi request
-//     if (err.response?.status === 401 && !original._retry) {
-//       original._retry = true;
-
-//       // nếu đang refresh, các request khác đợi
-//       if (isRefreshing) {
-//         return new Promise((resolve, reject) => {
-//           queue.push({ resolve, reject });
-//         }).then((token) => {
-//           original.headers.Authorization = `Bearer ${token}`;
-//           return api(original);
-//         });
-//       }
-
-//       isRefreshing = true;
-
-//       try {
-//         const r = await api.post("/auth/refresh"); // cookie refresh tự gửi
-//         const newToken = r.data.accessToken;
-
-//         setAccessToken(newToken);
-//         processQueue(null, newToken);
-
-//         original.headers.Authorization = `Bearer ${newToken}`;
-//         return api(original);
-//       } catch (refreshErr) {
-//         processQueue(refreshErr, null);
-//         // ở đây bạn có thể redirect về /login
-//         return Promise.reject(refreshErr);
-//       } finally {
-//         isRefreshing = false;
-//       }
-//     }
-
-//     return Promise.reject(err);
-//   }
-// );
-
-// export default api;
 import axios from "axios";
-import { clearAuthData, getToken } from "../utils/storage.js";
+// import { clearAuthData } from "../utils/storage.js";
 
-const ACCESS_TOKEN = "ACCESS_TOKEN"
+const ACCESS_TOKEN = "access_token"
 export const API_BASE_URL = 'http://localhost:8080/api/v1';
 
 const api = axios.create({
@@ -84,6 +12,7 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
+
 
 api.interceptors.request.use(
   (config) => {
@@ -98,6 +27,7 @@ api.interceptors.request.use(
   }
 );
 
+
 api.interceptors.response.use(
   (response) => {
     return response.data;
@@ -109,6 +39,12 @@ api.interceptors.response.use(
     console.log("Original request causing error:", originalRequest);
 
     if (status === 401 && !originalRequest._retry) {
+      if (originalRequest.url?.includes("/auth/refresh")) {
+        // refresh cũng 401 thì chắc chắn hết phiên -> logout
+        localStorage.removeItem(ACCESS_TOKEN);
+        window.location.href = "/";
+        return Promise.reject(error);
+      }
       try {
         originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
         
@@ -131,7 +67,7 @@ api.interceptors.response.use(
       } catch (refreshErr) {
         console.error("Token refresh failed:", refreshErr);
         localStorage.removeItem(ACCESS_TOKEN);
-        clearAuthData();
+        // clearAuthData();
         window.location.href = '/login';
         return Promise.reject(refreshErr);
       }

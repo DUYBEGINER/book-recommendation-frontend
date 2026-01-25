@@ -4,7 +4,7 @@ export const getUser = async () => {
     try {
         const response = await api.get("/auth/profile");
         console.log("Get user profile response:", response);
-        return response;
+        return response.data;
     } catch (error) {
         console.error('Get user profile failed:', error.response?.data || error.message)
         throw error
@@ -25,7 +25,7 @@ export const login = async (email, password) => {
 export const register = async (userData) => {
     try {
         const response = await api.post('/auth/register', userData)
-        return response;
+        return response.data;
     } catch (error) {
         console.error('Register failed:', error.response?.data || error.message)
         throw error

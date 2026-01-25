@@ -18,11 +18,28 @@ export const patterns = {
   phoneVN: /^(?:\+?84|0)(?:3|5|7|8|9)\d{8}$/
 };
 
+export function validateLogin(form) {
+  // form: { email, password }
+  const errors = {};
+  const email = (form.email || "").trim();
+  const password = form.password || "";
+  if(!email || !patterns.email.test(email)) {
+    errors.email = "Email không hợp lệ.";
+  }
+  if(!password) {
+    errors.password = "Mật khẩu không được để trống.";
+  }
+  return {
+    valid: Object.keys(errors).length === 0,
+    errors
+  };
+}
+
 // Hàm validate đăng ký
 export function validateSignup(form) {
   // form: { email, password, confirmPassword, username }
   const errors = {};
-console.log('Validating form:', form);
+  console.log('Validating form:', form);
   const email = (form.email || "").trim();
   const password = form.password || "";
   const confirmPassword = form.confirmPassword || "";
