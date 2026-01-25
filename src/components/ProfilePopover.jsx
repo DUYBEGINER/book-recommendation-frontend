@@ -9,7 +9,7 @@ const ProfilePopover = ({ user, logout }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-
+  
   // Theme management
   const [theme, setTheme] = useTheme();
 
@@ -70,6 +70,8 @@ const ProfilePopover = ({ user, logout }) => {
   const email = user?.email || 'Chưa cập nhật email';
   const avatarSrc = user?.avatarUrl || user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop';
 
+
+  console.log("ProfilePopover rendered. Current user:", user);
   return (
     <div className="relative" ref={dropdownRef}>
       {/* User Avatar Button */}
@@ -77,7 +79,7 @@ const ProfilePopover = ({ user, logout }) => {
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-800 rounded-full transition-colors"
       >
-        <span className="text-sm font-medium hidden md:block">{user?.username || 'No Name'}</span>
+        <span className="text-sm font-medium hidden md:block">{user?.fullName || 'No Name'}</span>
         <img
           src={avatarSrc}
           alt={displayName}

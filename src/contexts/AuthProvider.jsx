@@ -56,48 +56,6 @@ function AuthProvider({ children }) {
   }, [getUserProfile]);
 
 
-
-  // const fetchUserProfile = useCallback(async () => {
-  //   const token = getToken();
-  //   console.log("Fetching user profile with token:", token);
-  //   if (!token) return null;
-  //   setLoading(true);
-  //   try {
-  //     const userData = await getUser();
-  //     console.log("✅ User profile fetched successfully:", userData);
-  //     const normalizedUser = normalizeUser(userData);
-  //     setUser(normalizedUser);
-  //     setAuthData(token, normalizedUser);
-  //     setError(null);
-  //     return userData;
-  //   } catch (err) {
-  //     console.error("❌ Lỗi khi lấy user:", err);
-  //     if (err.response?.status === 401) {
-  //       clearAuthData();
-  //       setUser(null);
-  //       setJwt(null);
-  //     }
-  //     setError("Phiên đăng nhập hết hạn.");
-  //     return null;
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, []);
-
-  // Initialize Auth state from localStorage
-  // useEffect(() => {
-  //   const { token, user: storedUser } = getAuthData();
-  //   if (storedUser) {
-  //     setUser(storedUser);
-  //   }
-
-  //   if (token) {
-  //     fetchUserProfile();
-  //   } else {
-  //     setLoading(false);
-  //   }
-  // }, [fetchUserProfile]);
-
   // Login function
   const login = useCallback(async (emailInput, passwordInput) => {
     setLoading(true);
@@ -110,7 +68,7 @@ function AuthProvider({ children }) {
 
       setAuthData(accessToken);
       // setJwt(jwt);
-      setUser(userData);
+      setUser(userData?.user);
 
       return userData;
     } catch (error) {
@@ -143,6 +101,7 @@ function AuthProvider({ children }) {
   // Logout function
   const logout = useCallback(() => {
     try {
+      console.log("LOGGING OUT USER:", user);
       clearAuthData();
       setUser(null);
       return { success: true, message: "Logout successful" };
