@@ -8,24 +8,11 @@ import {
 import { AuthContext } from "./AuthContext";
 import { clearAuthData, getAccessToken, setAuthData } from "../utils/storage";
 
-// const normalizeUser = (userData = {}) => {
-//   if (!userData || typeof userData !== "object") return null;
-//   console.log("Normalizing user data:", userData);
 
-//   // Remove sensitive data like password if present
-//   const { password, ...rest } = userData;
-
-//   return {
-//     ...rest,
-//     isAdmin: rest.role?.toUpperCase() === "ADMIN",
-//   };
-// };
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  // const [error, setError] = useState(null);
-  // const [jwt, setJwt] = useState(getToken());
 
   console.log("AuthProvider rendered. Current user:", user);
 
