@@ -1,6 +1,6 @@
 const ACCESS_KEY = 'accessToken';
 
-export const tokkenUtils = {
+export const tokenUtils = {
 
     // Store access token
     setAccessToken(token) {
