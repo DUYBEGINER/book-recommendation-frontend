@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import {
   login as loginService,
   register as registerService,
+  logout as logoutService,
   getUser,
 } from "../services/authService";
 import { AuthContext } from "./AuthContext";
@@ -86,9 +87,10 @@ function AuthProvider({ children }) {
   }, []);
 
   // Logout function
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
     try {
       console.log("LOGGING OUT USER:", user);
+      await logoutService();
       clearAuthData();
       setUser(null);
       return { success: true, message: "Logout successful" };

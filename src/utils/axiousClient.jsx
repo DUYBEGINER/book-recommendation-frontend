@@ -48,7 +48,7 @@ axiosClient.interceptors.response.use(
     const originalRequest = error.config;
     console.log("Original request causing error:", originalRequest);
 
-     // Skip refresh for auth endpoints
+    // Skip refresh for auth endpoints
     // const isAuthEndpoint = originalRequest.url?.includes('/auth/');
     const isRefreshEndpoint = originalRequest.url?.includes('/auth/refresh');
 
@@ -74,7 +74,8 @@ axiosClient.interceptors.response.use(
     try{
       //Call refresh endpoint - cookie refreshToken will be sent automatically
       const response = await axiosClient.post("/auth/refresh");
-      const accessToken = response.data.data;;
+      const accessToken = response.data.accessToken;
+      console.log("access token response:", response);
       tokenUtils.setAccessToken(accessToken);
 
       processQueue(null, accessToken);
@@ -86,7 +87,8 @@ axiosClient.interceptors.response.use(
       tokenUtils.clearAccessTokens();
       
       // Redirect to login
-      window.location.href = '/login?session=expired';
+      // window.location.href = '/?session=expired';
+      window.location.href = '/';
       return Promise.reject(err);
     } finally {
       isRefreshing = false;
