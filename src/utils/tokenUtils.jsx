@@ -1,4 +1,4 @@
-const ACCESS_KEY = 'accessToken';
+const ACCESS_KEY = 'access_token';
 
 export const tokenUtils = {
 

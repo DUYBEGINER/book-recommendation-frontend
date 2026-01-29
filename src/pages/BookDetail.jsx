@@ -15,10 +15,10 @@ import {getSimilarBooks} from '../services/bookService';
 import { getBooks } from '../services/manageBookService';
 import { useParams } from "react-router-dom";
 import { getBookDetail } from '../services/manageBookService';
-import { API_BASE_URL } from '../config/ApiConfig';
+// import { API_BASE_URL } from '../config/ApiConfig';
 import { getAccessToken } from '../utils/storage';
 import { sendFeedback } from '../utils/feedbackHelper';
-
+const API_BASE_URL = 'http://localhost:8080/api/v1';
 // // Import all the new components
 const BookCover = React.lazy(() => import('../components/book-detail/BookCover'));
 const BookInfo = React.lazy(() => import('../components/book-detail/BookInfo'));

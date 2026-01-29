@@ -1,8 +1,8 @@
 import axios from "axios";
-import { API_BASE_URL } from "../config/ApiConfig";
+// import { API_BASE_URL } from "../config/ApiConfig";
 import { getAccessToken } from "./storage";
 import { tokenUtils } from "./tokenUtils";
-
+const API_BASE_URL = 'http://localhost:8080/api/v1';
 const axiosClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
@@ -46,13 +46,14 @@ axiosClient.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
-    console.log("Original request causing error:", originalRequest);
 
     // Skip refresh for auth endpoints
-    // const isAuthEndpoint = originalRequest.url?.includes('/auth/');
     const isRefreshEndpoint = originalRequest.url?.includes('/auth/refresh');
 
-    if(error.response?.status === 401 && !originalRequest._retry && !isRefreshEndpoint) {
+    // Only attempt refresh for 401 errors, not retried requests, and not refresh endpoint itself
+    if (error.response?.status === 401 && !originalRequest._retry && !isRefreshEndpoint) {
+      
+      // If already refreshing, queue this request
       if (isRefreshing) {
         return new Promise(function(resolve, reject) {
           failedQueue.push({ resolve, reject });
@@ -60,39 +61,102 @@ axiosClient.interceptors.response.use(
         .then((token) => {
           originalRequest.headers['Authorization'] = 'Bearer ' + token;
           return axiosClient(originalRequest);
-
         })
-        .catch ((err) => {
+        .catch((err) => {
           return Promise.reject(err);
         });
       }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        // Call refresh endpoint - cookie refreshToken will be sent automatically
+        const response = await axiosClient.post("/auth/refresh");
+        
+        // ✅ FIX: response đã được unwrap, không cần .data
+        const accessToken = response?.accessToken;
+        
+        if (accessToken) {
+          tokenUtils.setAccessToken(accessToken);
+          processQueue(null, accessToken);
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          return axiosClient(originalRequest);
+        } else {
+          throw new Error("No access token received");
+        }
+      } catch (err) {
+        processQueue(err, null);
+        tokenUtils.clearAccessTokens();
+        
+        // Redirect to login
+        window.location.href = '/';
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
+      }
     }
 
-    originalRequest._retry = true;
-    isRefreshing = true;
-
-    try{
-      //Call refresh endpoint - cookie refreshToken will be sent automatically
-      const response = await axiosClient.post("/auth/refresh");
-      const accessToken = response.data.accessToken;
-      console.log("access token response:", response);
-      tokenUtils.setAccessToken(accessToken);
-
-      processQueue(null, accessToken);
-
-      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-      return axiosClient(originalRequest);
-    } catch (err) {
-      processQueue(err, null);
-      tokenUtils.clearAccessTokens();
-      
-      // Redirect to login
-      // window.location.href = '/?session=expired';
-      window.location.href = '/';
-      return Promise.reject(err);
-    } finally {
-      isRefreshing = false;
-    }
+    // For all other errors, just reject
+    return Promise.reject(error);
   }
 );
+
+// axiosClient.interceptors.response.use(
+//   (response) => response.data,
+//   async (error) => {
+//     const originalRequest = error.config;
+
+//     // Skip refresh for auth endpoints
+//     const isRefreshEndpoint = originalRequest.url?.includes('/auth/refresh');
+
+//     // Only attempt refresh for 401 errors, not retried requests, and not refresh endpoint itself
+//     if (error.response?.status === 401 && !originalRequest._retry && !isRefreshEndpoint) {
+      
+//       // If already refreshing, queue this request
+//       if (isRefreshing) {
+//         return new Promise(function(resolve, reject) {
+//           failedQueue.push({ resolve, reject });
+//         })
+//         .then((token) => {
+//           originalRequest.headers['Authorization'] = 'Bearer ' + token;
+//           return axiosClient(originalRequest);
+//         })
+//         .catch((err) => {
+//           return Promise.reject(err);
+//         });
+//       }
+
+//       originalRequest._retry = true;
+//       isRefreshing = true;
+
+//       try {
+//         // Call refresh endpoint - cookie refreshToken will be sent automatically
+//         const response = await axiosClient.post("/auth/refresh");
+//         const accessToken = response?.accessToken;
+        
+//         if (accessToken) {
+//           tokenUtils.setAccessToken(accessToken);
+//           processQueue(null, accessToken);
+//           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+//           return axiosClient(originalRequest);
+//         } else {
+//           throw new Error("No access token received");
+//         }
+//       } catch (err) {
+//         processQueue(err, null);
+//         tokenUtils.clearAccessTokens();
+        
+//         // Redirect to login
+//         window.location.href = '/';
+//         return Promise.reject(err);
+//       } finally {
+//         isRefreshing = false;
+//       }
+//     }
+
+//     // For all other errors, just reject
+//     return Promise.reject(error);
+//   }
+// );
 export { axiosClient };

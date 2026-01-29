@@ -1,8 +1,9 @@
-import api from '../config/ApiConfig.js'
+// import api from '../config/ApiConfig.js'
+import { axiosClient } from "../utils/axiousClient";
 
 export const getRecommendedBooks = async (userId, limit = 10) => {
   try {
-    const response = await api.get('/recommendations', {
+    const response = await axiosClient.get('/recommendations', {
       params: { userId, limit }
     });
     console.log("Recommended books response:", response);
@@ -15,7 +16,7 @@ export const getRecommendedBooks = async (userId, limit = 10) => {
 
 export const getSimilarBooks = async (bookId, limit = 10) => {
   try {
-    const response = await api.get('/similar-books', {
+    const response = await axiosClient.get('/similar-books', {
       params: { bookId, limit }
     });
     return response;
@@ -27,7 +28,7 @@ export const getSimilarBooks = async (bookId, limit = 10) => {
 
 export const getDiversityBooks = async (bookId, { limit = 5 } = {}) => {
   try {
-    const response = await api.get('/diversity-books', {
+    const response = await axiosClient.get('/diversity-books', {
       params: {
         bookId,
         limit
@@ -42,7 +43,7 @@ export const getDiversityBooks = async (bookId, { limit = 5 } = {}) => {
 
 export const getBookDetail = async (bookId) => {
   try {
-    const response = await api.get(`/books/${bookId}`);
+    const response = await axiosClient.get(`/books/${bookId}`);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch book detail:", error);
@@ -58,7 +59,7 @@ export const getBookDetail = async (bookId) => {
  */
 export const getMostReadBooks = async (page = 0, size = 5) => {
   try {
-    const response = await api.get('/books/most-read', {
+    const response = await axiosClient.get('/books/most-read', {
       params: { page, size }
     });
     return response;
@@ -70,7 +71,7 @@ export const getMostReadBooks = async (page = 0, size = 5) => {
 
 export const getPreviewBook = async (bookId) => {
   try {
-    const response = await api.get(`/books/${bookId}/preview`);
+    const response = await axiosClient.get(`/books/${bookId}/preview`);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch book preview:", error);
