@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { axiosClient } from '../utils/axiousClient';
+import api from '../config/ApiConfig.js';
 
 const DEFAULT_MODEL_INFO = {
   key: 'implicit',
@@ -129,7 +129,7 @@ const getApiData = (response) => response?.data?.data ?? response?.data ?? null;
 
 const fetchActiveModelInfo = async () => {
   try {
-    const response = await axiosClient.get('/recommendation/active-model');
+    const response = await api.get('/recommendation/active-model');
     const payload = getApiData(response);
     if (payload?.baseUrl) {
       setActiveModelCache(payload);
@@ -177,7 +177,7 @@ export const refreshModelRegistry = async (force = false) => {
     };
   }
 
-  const response = await axiosClient.get('/admin/recommendation/models');
+  const response = await api.get('/admin/recommendation/models');
   const payload = getApiData(response);
   const models = payload?.models ?? [];
   const activeKey = payload?.activeKey
@@ -214,7 +214,7 @@ export const getAvailableRecommendationModels = async (force = false) => {
  * Set active recommendation model (admin only)
  */
 export const setActiveRecommendationModel = async (modelKey) => {
-  const response = await axiosClient.put(`/admin/recommendation/models/${modelKey}`);
+  const response = await api.put(`/admin/recommendation/models/${modelKey}`);
   const payload = getApiData(response);
 
   if (payload?.baseUrl) {
@@ -235,7 +235,7 @@ export const setActiveRecommendationModel = async (modelKey) => {
  */
 export const getHealthStatus = async () => {
   try {
-    const response = await axiosClient.get('/admin/recommendation/health');
+    const response = await api.get('/admin/recommendation/health');
     return getApiData(response);
   } catch (error) {
     console.error('Failed to get health status:', error);
@@ -248,7 +248,7 @@ export const getHealthStatus = async () => {
  */
 export const getModelInfo = async () => {
   try {
-    const response = await axiosClient.get('/admin/recommendation/model-info');
+    const response = await api.get('/admin/recommendation/model-info');
     return getApiData(response);
   } catch (error) {
     console.error('Failed to get model info:', error);
@@ -262,7 +262,7 @@ export const getModelInfo = async () => {
  */
 export const triggerRetrain = async () => {
   try {
-    const response = await axiosClient.post('/admin/recommendation/retrain');
+    const response = await api.post('/admin/recommendation/retrain');
     return getApiData(response);
   } catch (error) {
     console.error('Failed to trigger retrain:', error);
@@ -328,7 +328,7 @@ export const recordFeedback = async (userId, bookId, event, value = null, option
  */
 export const getOnlineLearningStatus = async () => {
   try {
-    const response = await axiosClient.get('/admin/recommendation/online-learning/status');
+    const response = await api.get('/admin/recommendation/online-learning/status');
     return getApiData(response);
   } catch (error) {
     console.error('Failed to get online learning status:', error);
@@ -341,7 +341,7 @@ export const getOnlineLearningStatus = async () => {
  */
 export const enableOnlineLearning = async (bufferSize = 100) => {
   try {
-    const response = await axiosClient.post('/admin/recommendation/online-learning/enable', null, {
+    const response = await api.post('/admin/recommendation/online-learning/enable', null, {
       params: { bufferSize },
     });
     return getApiData(response);
@@ -356,7 +356,7 @@ export const enableOnlineLearning = async (bufferSize = 100) => {
  */
 export const disableOnlineLearning = async () => {
   try {
-    const response = await axiosClient.post('/admin/recommendation/online-learning/disable');
+    const response = await api.post('/admin/recommendation/online-learning/disable');
     return getApiData(response);
   } catch (error) {
     console.error('Failed to disable online learning:', error);
@@ -369,7 +369,7 @@ export const disableOnlineLearning = async () => {
  */
 export const triggerIncrementalUpdate = async (force = false) => {
   try {
-    const response = await axiosClient.post('/admin/recommendation/online-learning/update', null, {
+    const response = await api.post('/admin/recommendation/online-learning/update', null, {
       params: { force },
     });
     return getApiData(response);
@@ -384,7 +384,7 @@ export const triggerIncrementalUpdate = async (force = false) => {
  */
 export const getCacheStats = async () => {
   try {
-    const response = await axiosClient.get('/admin/recommendation/cache/stats');
+    const response = await api.get('/admin/recommendation/cache/stats');
     return getApiData(response);
   } catch (error) {
     console.error('Failed to get cache stats:', error);
@@ -397,7 +397,7 @@ export const getCacheStats = async () => {
  */
 export const clearRecommendationCache = async () => {
   try {
-    const response = await axiosClient.delete('/admin/recommendation/cache');
+    const response = await api.delete('/admin/recommendation/cache');
     return getApiData(response);
   } catch (error) {
     console.error('Failed to clear recommendation cache:', error);
@@ -412,7 +412,7 @@ export const clearRecommendationCache = async () => {
  */
 export const getRedisCacheSummary = async () => {
   try {
-    const response = await axiosClient.get('/admin/redis/summary');
+    const response = await api.get('/admin/redis/summary');
     return getApiData(response);
   } catch (error) {
     console.error('Failed to get Redis cache summary:', error);
@@ -425,7 +425,7 @@ export const getRedisCacheSummary = async () => {
  */
 export const getAllRedisCaches = async () => {
   try {
-    const response = await axiosClient.get('/admin/redis/caches');
+    const response = await api.get('/admin/redis/caches');
     return getApiData(response);
   } catch (error) {
     console.error('Failed to get Redis caches:', error);
@@ -438,7 +438,7 @@ export const getAllRedisCaches = async () => {
  */
 export const searchRedisKeys = async (pattern = '*') => {
   try {
-    const response = await axiosClient.get('/admin/redis/keys', {
+    const response = await api.get('/admin/redis/keys', {
       params: { pattern },
     });
     return getApiData(response);
@@ -453,7 +453,7 @@ export const searchRedisKeys = async (pattern = '*') => {
  */
 export const getRedisKeyInfo = async (key) => {
   try {
-    const response = await axiosClient.get('/admin/redis/key', {
+    const response = await api.get('/admin/redis/key', {
       params: { key },
     });
     return getApiData(response);
@@ -468,7 +468,7 @@ export const getRedisKeyInfo = async (key) => {
  */
 export const getRedisKeyValue = async (key) => {
   try {
-    const response = await axiosClient.get('/admin/redis/value', {
+    const response = await api.get('/admin/redis/value', {
       params: { key },
     });
     return getApiData(response);
@@ -483,7 +483,7 @@ export const getRedisKeyValue = async (key) => {
  */
 export const logAllRedisCaches = async () => {
   try {
-    const response = await axiosClient.post('/admin/redis/log-all');
+    const response = await api.post('/admin/redis/log-all');
     return getApiData(response);
   } catch (error) {
     console.error('Failed to log Redis caches:', error);

@@ -17,6 +17,7 @@ function AuthProvider({ children }) {
 
   console.log("AuthProvider rendered. Current user:", user);
 
+  
   const getUserProfile = useCallback(async () => {
     const token = getAccessToken();
     console.log("Fetching user profile with token:", token);
@@ -33,6 +34,8 @@ function AuthProvider({ children }) {
       setLoading(false);
     } 
   }, []);
+
+
 
   useEffect(() => {
     const token = getAccessToken();

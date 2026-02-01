@@ -13,7 +13,7 @@ const CategoryDropdown = ({ onSelect }) => {
       return;
     }
 
-    navigate(`/category/${category.genreId}?name=${encodeURIComponent(category.name)}`);
+    navigate(`/category/${category.genreId}?name=${encodeURIComponent(category.genreName)}`);
   };
 
   useEffect(() => {
@@ -21,6 +21,7 @@ const CategoryDropdown = ({ onSelect }) => {
       setIsLoading(true);
       try {
         const genres = await getAllGenres();
+        console.log("Loaded genres:", genres);
         setGenres(genres);
       } catch (error) {
         console.error("Không thể tải danh sách thể loại:", error);

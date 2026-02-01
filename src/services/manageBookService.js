@@ -5,7 +5,6 @@ export const getBooks = async (page = 0, size = 10) => {
     const response = await api.get("/books", {
       params: { page, size }
     });
-    // console.log("Get books response:", response);
     return response;
   } catch (error) {
     console.error("Get books failed:", error.response?.data || error.message);
@@ -58,8 +57,7 @@ export const searchBooks = async (keyword, page = 0, size = 10) => {
 export const getBookDetail = async (bookId) => {
   try {
     const response = await api.get(`/books/${bookId}`);
-    // console.log("Get book detail response:", response);
-    return response.data;
+    return response.data || response;
   } catch (error) {
     console.error(
       "Get book detail failed:",
@@ -76,7 +74,6 @@ export const createBook = async (payload) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    console.log("Create book response:", response);
     return response;
   } catch (error) {
     console.error("Create book failed:", error.response?.data || error.message);
@@ -91,7 +88,6 @@ export const updateBook = async (bookId, payload) => {
         "Content-Type": "multipart/form-data",
       },
     });
-    console.log("Update book response:", response);
     return response;
   } catch (error) {
     console.error("Update book failed:", error.response?.data || error.message);
@@ -102,7 +98,6 @@ export const updateBook = async (bookId, payload) => {
 export const deleteBook = async (bookId) => {
   try {
     const response = await api.delete(`/admin/books/delete/${bookId}`);
-    console.log("Delete book response:", response);
     return response;
   } catch (error) {
     console.error("Delete book failed:", error.response?.data || error.message);
@@ -143,6 +138,16 @@ export const getAdminBooks = async ({
     return await api.get("/admin/books", { params });
   } catch (error) {
     console.error("Get admin books failed:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+export const getBookFormats = async (bookId) => {
+  try {
+    const response = await api.get(`/books/${bookId}/formats`);
+    return response.data || response || [];
+  } catch (error) {
+    console.error("Get book formats failed:", error.response?.data || error.message);
     throw error;
   }
 };

@@ -5,7 +5,6 @@ import api from "../config/ApiConfig.js";
  * @param {{ page?: number, size?: number, keyword?: string, sort?: string }} params
  * @returns {{ genres: Array, page: Object|null, message: string }}
  */
-
 export const getGenres = async ({ page = 0, size = 50, keyword = "", sort = "" } = {}) => {
   try {
     const params = { page, size };
@@ -18,10 +17,10 @@ export const getGenres = async ({ page = 0, size = 50, keyword = "", sort = "" }
 
     const response = await api.get("/books/genres", { params });
 
-    const pageData = response.data ?? null;
-  
+    const pageData = response.data || response || null;
+    console.log("Fetched genres:", pageData);
     return {
-      genres: pageData?.content ?? [],
+      genres: pageData?.content || [],
       page: pageData,
       message: response.message,
     };
@@ -34,8 +33,7 @@ export const getGenres = async ({ page = 0, size = 50, keyword = "", sort = "" }
 export const getAllGenres = async () => {
   try {
     const response = await api.get("/genres");
-    console.log("All genres response:", response);
-    return response.data;
+    return response.data || response || [];
   } catch (error) {
     console.error("Error fetching all genres:", error.response?.data || error.message);
     throw error;
@@ -49,7 +47,7 @@ export const getAllGenres = async () => {
 export const createGenre = async (genreData) => {
   try {
     const response = await api.post("/admin/genres/create", genreData);
-    return response.data;
+    return response.data || response;
   } catch (error) {
     console.error("Error creating genre:", error.response?.data || error.message);
     throw error;
@@ -64,7 +62,7 @@ export const createGenre = async (genreData) => {
 export const updateGenre = async (genreId, genreData) => {
   try {
     const response = await api.put(`/admin/genres/update/${genreId}`, genreData);
-    return response.data;
+    return response.data || response;
   } catch (error) {
     console.error("Error updating genre:", error.response?.data || error.message);
     throw error;
@@ -78,7 +76,7 @@ export const updateGenre = async (genreId, genreData) => {
 export const deleteGenre = async (genreId) => {
   try {
     const response = await api.delete(`/admin/genres/delete/${genreId}`);
-    return response.data;
+    return response.data || response;
   } catch (error) {
     console.error("Error deleting genre:", error.response?.data || error.message);
     throw error;

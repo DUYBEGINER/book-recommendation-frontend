@@ -1,79 +1,96 @@
+/**
+ * API Configuration
+ * Centralized API base URL and axios instance
+ */
 import axios from "axios";
-// // import { clearAuthData } from "../utils/storage.js";
+import { getAccessToken, setAuthData, clearAuthData } from "../utils/storage";
 
-const ACCESS_TOKEN = "access_token"
-const API_BASE_URL = 'http://localhost:8080/api/v1';
-export default API_BASE_URL;
-// const api = axios.create({
-//   baseURL: API_BASE_URL,
-//   timeout: 100000,
-//   withCredentials: true, // Để cookie httpOnly gửi kèm
-//   headers: {
-//     "Content-Type": "application/json",
-//   },
-// }); 
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
+// Track refresh state to prevent multiple refresh calls
+let isRefreshing = false;
+let failedQueue = [];
 
-// api.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem(ACCESS_TOKEN);
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
 
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 30000,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-// api.interceptors.response.use(
-//   (response) => {
-//     return response.data;
-//   },
-//   async (error) => {
-//     // Kiểm tra error.response tồn tại trước khi truy cập status
-//     const status = error.response?.status;
-//     const originalRequest = error.config;
-//     console.log("Original request causing error:", originalRequest);
-    
-//     if (status === 401 && !originalRequest._retry) {
-//       if (originalRequest.url?.includes("/auth/refresh")) {
-//         // refresh cũng 401 thì chắc chắn hết phiên -> logout
-//         localStorage.removeItem(ACCESS_TOKEN);
-//         window.location.href = "/";
-//         return Promise.reject(error);
-//       }
-//       try {
-//         originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
+// Request interceptor - Add auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = getAccessToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Response interceptor - Handle token refresh
+api.interceptors.response.use(
+  (response) => response.data,
+  async (error) => {
+    const originalRequest = error.config;
+    const isRefreshEndpoint = originalRequest.url?.includes('/auth/refresh');
+
+    // Only attempt refresh for 401 errors, not retried requests, and not refresh endpoint itself
+    if (error.response?.status === 401 && !originalRequest._retry && !isRefreshEndpoint) {
+      
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+        .then((token) => {
+          originalRequest.headers['Authorization'] = 'Bearer ' + token;
+          return api(originalRequest);
+        })
+        .catch((err) => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        const response = await api.post("/auth/refresh");
+        const accessToken = response?.accessToken;
         
-//         // Gọi refresh endpoint - cookie refreshToken sẽ tự động được gửi kèm
-//         const response = await api.post("/auth/refresh");
-//         console.log("access token response:", response);
-        
-//         // Response đã được unwrap bởi interceptor nên không cần .data
-//         const newToken = response?.accessToken;
-        
-//         if (newToken) {
-//           localStorage.setItem(ACCESS_TOKEN, newToken);
-//           // Update authorization header
-//           api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-//           originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
-//           return api(originalRequest);
-//         }
-        
-//         throw new Error('No access token received');
-//       } catch (refreshErr) {
-//         console.error("Token refresh failed:", refreshErr);
-//         localStorage.removeItem(ACCESS_TOKEN);
-//         // clearAuthData();
-//         window.location.href = '/';
-//         return Promise.reject(refreshErr);
-//       }
-//     }
-//     return Promise.reject(error); // For all other errors, return the error as is.
-//   }
-// );
+        if (accessToken) {
+          setAuthData(accessToken);
+          processQueue(null, accessToken);
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+          return api(originalRequest);
+        } else {
+          throw new Error("No access token received");
+        }
+      } catch (err) {
+        processQueue(err, null);
+        clearAuthData();
+        window.location.href = '/';
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
+      }
+    }
 
-// export default api;
+    return Promise.reject(error);
+  }
+);
+
+export default api;

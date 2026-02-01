@@ -1,12 +1,10 @@
-// import api from '../config/ApiConfig.js'
-import { axiosClient } from "../utils/axiousClient";
+import api from "../config/ApiConfig.js";
 
 export const getRecommendedBooks = async (userId, limit = 10) => {
   try {
-    const response = await axiosClient.get('/recommendations', {
+    const response = await api.get('/recommendations', {
       params: { userId, limit }
     });
-    console.log("Recommended books response:", response);
     return response;
   } catch (error) {
     console.error("Failed to fetch recommended books:", error);
@@ -16,7 +14,7 @@ export const getRecommendedBooks = async (userId, limit = 10) => {
 
 export const getSimilarBooks = async (bookId, limit = 10) => {
   try {
-    const response = await axiosClient.get('/similar-books', {
+    const response = await api.get('/similar-books', {
       params: { bookId, limit }
     });
     return response;
@@ -28,11 +26,8 @@ export const getSimilarBooks = async (bookId, limit = 10) => {
 
 export const getDiversityBooks = async (bookId, { limit = 5 } = {}) => {
   try {
-    const response = await axiosClient.get('/diversity-books', {
-      params: {
-        bookId,
-        limit
-      }
+    const response = await api.get('/diversity-books', {
+      params: { bookId, limit }
     });
     return response;
   } catch (error) {
@@ -43,8 +38,8 @@ export const getDiversityBooks = async (bookId, { limit = 5 } = {}) => {
 
 export const getBookDetail = async (bookId) => {
   try {
-    const response = await axiosClient.get(`/books/${bookId}`);
-    return response.data;
+    const response = await api.get(`/books/${bookId}`);
+    return response.data || response;
   } catch (error) {
     console.error("Failed to fetch book detail:", error);
     throw error;
@@ -59,7 +54,7 @@ export const getBookDetail = async (bookId) => {
  */
 export const getMostReadBooks = async (page = 0, size = 5) => {
   try {
-    const response = await axiosClient.get('/books/most-read', {
+    const response = await api.get('/books/most-read', {
       params: { page, size }
     });
     return response;
@@ -71,10 +66,10 @@ export const getMostReadBooks = async (page = 0, size = 5) => {
 
 export const getPreviewBook = async (bookId) => {
   try {
-    const response = await axiosClient.get(`/books/${bookId}/preview`);
-    return response.data;
+    const response = await api.get(`/books/${bookId}/preview`);
+    return response.data || response;
   } catch (error) {
     console.error("Failed to fetch book preview:", error);
     throw error;
   }
-}
+};

@@ -33,9 +33,8 @@ const CategoryBooks = () => {
         const matchedGenre = genres.find(
           (genre) => String(genre.genreId) === String(categoryId),
         );
-
         if (matchedGenre) {
-          setGenreName(matchedGenre.name);
+          setGenreName(matchedGenre.genreName);
           setGenreDescription(matchedGenre.description || "");
         } else {
           setGenreName(initialCategoryName);

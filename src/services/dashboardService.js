@@ -19,15 +19,14 @@ export const getAdminDashboard = async (params = {}) => {
     });
 
     return {
-      dashboard: response.data ?? null,
-      message: response.message,
+      dashboard: response.data || response || null,
+      message: "Dashboard data retrieved successfully",
     };
   } catch (error) {
-    console.error(
-      "Error fetching admin dashboard:",
-      error.response?.data || error.message,
-    );
-    throw error;
+    console.error("Failed to fetch dashboard:", error);
+    return {
+      dashboard: null,
+      message: error.response?.data?.message || error.message || "Failed to fetch dashboard",
+    };
   }
 };
-
