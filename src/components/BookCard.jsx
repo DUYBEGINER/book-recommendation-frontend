@@ -18,7 +18,6 @@ const BookCard = ({ book }) => {
         return
       }
       const data = await getPreviewBook(bookId);
-      console.log("Preview book data:", data);
       setPreviewCache(prev => ({ ...prev, [bookId]: data }))
       setPreviewBook(data);
       setShowTooltip(true);

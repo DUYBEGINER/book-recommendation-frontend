@@ -48,10 +48,23 @@ api.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
-    const isRefreshEndpoint = originalRequest.url?.includes('/auth/refresh');
+    console.log("API request error:", error);
+    // Guard: No config means network error or cancelled request
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
 
+    const isRefreshEndpoint = originalRequest.url?.includes('/auth/refresh');
+    const hasRetried = originalRequest._retry === true;
+    const is401Error = error.response?.status === 401;
+    console.log("API response error intercepted:", {
+      url: originalRequest.url,
+      status: error.response?.status,
+      isRefreshEndpoint,
+      hasRetried,
+    });
     // Only attempt refresh for 401 errors, not retried requests, and not refresh endpoint itself
-    if (error.response?.status === 401 && !originalRequest._retry && !isRefreshEndpoint) {
+    if (is401Error && !hasRetried && !isRefreshEndpoint) {
       
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -69,7 +82,7 @@ api.interceptors.response.use(
 
       try {
         const response = await api.post("/auth/refresh");
-        const accessToken = response?.accessToken;
+        const accessToken = response?.data?.accessToken || response?.accessToken;
         
         if (accessToken) {
           setAuthData(accessToken);
@@ -82,6 +95,7 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
         clearAuthData();
+        console.log("Clear auth data and redirect to login");
         window.location.href = '/';
         return Promise.reject(err);
       } finally {
