@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { Search, ChevronDown, Facebook, Twitter, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import BookCard from './BookCard';
@@ -27,13 +25,6 @@ const BookCarousel = ({ books, title, genreId, genreName, subtitle, extraHeader,
             extra={extraHeader}
           />
         )}
-      {/* <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
-        <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
-          Xem tất cả
-        </button>
-      </div> */}
-      
       <div className="relative group">
         <button
           onClick={() => scroll('left')}

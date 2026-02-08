@@ -10,8 +10,6 @@ import { searchBooks } from '../services/manageBookService';
 const Header = ({
   onAuthClick,
   user,
-  searchValue,
-  onSearchChange,
   onSearchSubmit,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -23,19 +21,8 @@ const Header = ({
   const searchTimeoutRef = useRef(null);
   const searchContainerRef = useRef(null);
 
-  const isSearchControlled = typeof searchValue === 'string';
-
-  const currentSearchValue = useMemo(
-    () => (isSearchControlled ? searchValue : internalSearch),
-    [isSearchControlled, searchValue, internalSearch]
-  );
-
   const updateSearchValue = (value) => {
-    if (isSearchControlled) {
-      onSearchChange?.(value);
-    } else {
-      setInternalSearch(value);
-    }
+    setInternalSearch(value);
 
     // Clear previous timeout
     if (searchTimeoutRef.current) {
@@ -54,7 +41,7 @@ const Header = ({
       setIsLoadingSuggestions(true);
       try {
         const response = await searchBooks(value.trim(), 0, 5); 
-        const books = response?.data || response?.content || [];
+        const books = response?.data || [];
         const booksArray = Array.isArray(books) ? books : [];
         setSuggestions(booksArray);
         
@@ -98,7 +85,7 @@ const Header = ({
   }, []);
 
   const triggerSearch = () => {
-    const query = (currentSearchValue || '').trim();
+    const query = (internalSearch || '').trim();
     if (onSearchSubmit) {
       onSearchSubmit(query);
       setShowSuggestions(false);
@@ -148,7 +135,7 @@ const Header = ({
               <input
                 type="text"
                 placeholder="Tìm sách..."
-                value={currentSearchValue}
+                value={internalSearch}
                 onChange={(e) => updateSearchValue(e.target.value)}
                 onKeyDown={handleSearchKeyDown}
                 onFocus={() => {
@@ -214,7 +201,7 @@ const Header = ({
               <input
                 type="text"
                 placeholder="Tìm sách..."
-                value={currentSearchValue}
+                value={internalSearch}
                 onChange={(e) => updateSearchValue(e.target.value)}
                 onKeyDown={handleSearchKeyDown}
                 className="w-full px-4 py-2 pr-12 rounded-lg bg-gray-800 text-white placeholder-gray-400"

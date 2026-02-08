@@ -8,8 +8,6 @@ const MainLayout = ({
   children,
   showHero = false,
   heroContent = null,
-  searchValue,
-  onSearchChange,
   onSearchSubmit,
   onGenreSelect,
 }) => {
@@ -29,8 +27,6 @@ const MainLayout = ({
       <Header
         onAuthClick={openAuthModal}
         user={user}
-        searchValue={searchValue}
-        onSearchChange={onSearchChange}
         onSearchSubmit={onSearchSubmit}
         onGenreSelect={onGenreSelect}
       />

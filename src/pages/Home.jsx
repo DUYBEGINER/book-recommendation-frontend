@@ -1,13 +1,20 @@
 import React, { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../hook/useAuth";
+
+// Components
 import Hero from "../components/Hero";
 import BookCarousel from "../components/BookCarousel";
 import TopBooksShowcase from "../components/TopBooksShowcase";
 import ThemeToggle from "../components/ThemeToggle";
+
+// Layout
 import MainLayout from "../layout/MainLayout";
+
+// Services
 import { getBooksByGenre } from "../services/manageBookService";
 import { getMostReadBooks } from "../services/bookService";
-import useAuth from "../hook/useAuth";
+
 
 const DEFAULT_PAGE_SIZE = 12;
 const TOP_BOOKS_SIZE = 4;
