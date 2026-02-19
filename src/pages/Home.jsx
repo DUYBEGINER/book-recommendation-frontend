@@ -170,31 +170,32 @@ const Home = () => {
     >
       <ThemeToggle />
       <main className="mt-8 px-4 sm:px-6 lg:px-8 space-y-8">
-        {topBooksLoading && (
+        {/* {topBooksLoading && (
           <div className="py-16 text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
             <p className="mt-4 text-gray-600 dark:text-gray-300">Đang tải sách...</p>
           </div>
-        )}
+        )} */}
 
-        {error && (
+        {/* {error && (
           <div className="py-8 text-center bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl">
             <p className="text-red-600 dark:text-red-300 font-medium">{error}</p>
           </div>
-        )}
-
+        )} */}
+        <h1 className="text-2xl text-white font-bold text-center py-4">HAPPY NEW YEAR</h1>
+        <h2 className="text-2xl text-white font-bold text-center py-4">HELLO WORLD</h2>
         {!topBooksLoading && !error && (
           <>
             {/* Top Books Showcase - Most Read Books */}
-            {topBooks.length > 0 && (
+            {/* {topBooks.length > 0 && (
               <TopBooksShowcase 
                 books={topBooks} 
                 title="Top sách được đọc nhiều nhất" 
               />
-            )}
+            )} */}
 
             {/* Genre Carousels - Lazy Loaded */}
-            {genreSections}
+            {/* {genreSections} */}
           </>
         )}
       </main>
