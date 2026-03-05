@@ -1,7 +1,6 @@
-import React, { createContext, useContext, useMemo } from 'react';
+import React, {  useMemo } from 'react';
 import { message } from 'antd';
-
-const MessageContext = createContext();
+import { MessageContext } from './MessageContext';
 
 export const MessageProvider = ({ children }) => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -32,10 +31,3 @@ export const MessageProvider = ({ children }) => {
   );
 };
 
-export const useMessage = () => {
-  const context = useContext(MessageContext);
-  if (!context) {
-    throw new Error('useMessage must be used within MessageProvider');
-  }
-  return context;
-};

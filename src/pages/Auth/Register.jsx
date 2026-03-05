@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import useAuth from '../../hooks/useAuth.jsx';
 import { validateSignup } from '../../utils/validatorInput.js';
-import { useMessage } from '../../contexts/MessageProvider.jsx';
+import useMessage  from '../../hooks/useMessage.jsx'; 
 
 const INITIAL_FORM_STATE = {
   email: '',

@@ -5,7 +5,7 @@ import EmptyState from "../../components/account/EmptyState"
 import BookCard from "../../components/common/BookCard"
 import useAuth from "../../hooks/useAuth"
 import { getBookFavorites, removeFavorite } from "../../services/favoriteService"
-import { useMessage } from "../../contexts/MessageProvider"
+import useMessage from "../../hooks/useMessage";
 import { sendFeedback } from "../../utils/feedbackHelper"
 
 const FavoritesSection = React.memo(() => {

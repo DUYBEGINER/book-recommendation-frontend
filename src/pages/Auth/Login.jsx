@@ -5,7 +5,7 @@ import useAuth from '../../hooks/useAuth.jsx';
 import { PATHS } from '../../constants/routePaths.js';
 import ButtonLoginGoogle from '../../components/auth/ButtonLoginGoogle.jsx';
 import { validateLogin } from '../../utils/validatorInput.js'; 
-import { useMessage } from '../../contexts/MessageProvider.jsx';
+import useMessage  from '../../hooks/useMessage.jsx'; 
 
 const Login = ({ onModeChange, onClose }) => {
   const { login } = useAuth();

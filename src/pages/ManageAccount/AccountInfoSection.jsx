@@ -3,7 +3,7 @@ import AccountTabs from "../../components/account/AccountTab";
 import PersonalInfoForm from "../../components/account/PersonalInfoForm";
 import SecurityForm from "../../components/account/SecurityForm";
 import useAuth from "../../hooks/useAuth";
-import { useMessage } from "../../contexts/MessageProvider";
+import useMessage from "../../hooks/useMessage";
 import {
   getUserProfile,
   changeUserPassword,
