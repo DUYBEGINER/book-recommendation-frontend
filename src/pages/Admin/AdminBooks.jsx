@@ -1,14 +1,14 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import AdminLayout from "../../layout/AdminLayout"
+import AdminLayout from "../../layouts/AdminLayout"
 import SearchBar from "../../components/admin/SearchBar"
 import GenreFilter from "../../components/admin/GenreFilter"
 import SortSelect from "../../components/admin/SortSelect"
 import BookTable from "../../components/admin/BookTable"
 import { Button, Modal, message } from "antd"
 import { Plus, Trash2 } from "lucide-react"
-import { PATHS } from "../../constant/routePath"
+import { PATHS } from "../../constants/routePaths"
 import { deleteBook as deleteBookApi, deleteBooksBulk, getAdminBooks } from "../../services/manageBookService"
 
 // const mockBooks = Array.from({ length: 10 }, (_, i) => ({

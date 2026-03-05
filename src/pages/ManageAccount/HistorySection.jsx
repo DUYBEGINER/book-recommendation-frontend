@@ -1,10 +1,10 @@
 import React from "react";
 import { History, Loader2 } from "lucide-react";
 import EmptyState from "../../components/account/EmptyState";
-import BookCard from "../../components/BookCard";
+import BookCard from "../../components/common/BookCard";
 import Pagination from "../../components/admin/Pagination";
 import { getUserHistory } from "../../services/historyService";
-import useAuth from "../../hook/useAuth";
+import useAuth from "../../hooks/useAuth";
 
 const PAGE_SIZE = 8;
 

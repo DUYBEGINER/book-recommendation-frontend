@@ -2,7 +2,7 @@
 import { Pen, Star, Calendar, BookOpen } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useState } from "react"
-import { getPreviewBook } from "../services/bookService"
+import { getPreviewBook } from "../../services/bookService"
 
 const BookCard = ({ book }) => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
-import AdminLayout from "../../layout/AdminLayout"
+import AdminLayout from "../../layouts/AdminLayout"
 import SearchBar from "../../components/admin/SearchBar"
 import GenreTable from "../../components/admin/GenreTable"
 import { Button, Modal, Form, Input, message } from "antd"

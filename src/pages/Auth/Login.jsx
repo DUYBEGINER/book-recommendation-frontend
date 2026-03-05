@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../../hook/useAuth.jsx';
-import { PATHS } from '../../constant/routePath.jsx';
-import ButtonLoginGoogle from '../../components/ButtonLoginGoogle.jsx';
+import useAuth from '../../hooks/useAuth.jsx';
+import { PATHS } from '../../constants/routePaths.js';
+import ButtonLoginGoogle from '../../components/auth/ButtonLoginGoogle.jsx';
 import { validateLogin } from '../../utils/validatorInput.js'; 
 import { useMessage } from '../../contexts/MessageProvider.jsx';
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-import useAuth from '../../hook/useAuth.jsx';
+import useAuth from '../../hooks/useAuth.jsx';
 import { validateSignup } from '../../utils/validatorInput.js';
 import { useMessage } from '../../contexts/MessageProvider.jsx';
 

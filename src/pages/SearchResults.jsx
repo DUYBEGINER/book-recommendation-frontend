@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import MainLayout from "../layout/MainLayout";
-import BookCarousel from "../components/BookCarousel";
+import MainLayout from "../layouts/MainLayout";
+import BookCarousel from "../components/common/BookCarousel";
 import { searchBooks } from "../services/manageBookService";
 
 const DEFAULT_PAGE_SIZE = 12;

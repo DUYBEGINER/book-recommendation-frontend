@@ -7,8 +7,8 @@ import {
   CloseCircleOutlined,
 } from "@ant-design/icons";
 import { Camera, File} from "lucide-react";
-import AdminLayout from "../../layout/AdminLayout";
-import { PATHS } from "../../constant/routePath";
+import AdminLayout from "../../layouts/AdminLayout";
+import { PATHS } from "../../constants/routePaths";
 import { createBook } from "../../services/manageBookService";
 import { getGenres } from "../../services/genreService";
 

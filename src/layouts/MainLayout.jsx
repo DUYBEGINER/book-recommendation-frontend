@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import Header from '../components/header/Header';
-import Footer from '../components/Footer';
-import AuthModal from '../components/AuthModal';
-import ThemeToggle from '../components/ThemeToggle';
-import useAuth from '../hook/useAuth';
+import Footer from './Footer';
+import AuthModal from '../components/auth/AuthModal';
+import ThemeToggle from '../components/common/ThemeToggle';
+import useAuth from '../hooks/useAuth';
 
 const MainLayout = ({
   children,

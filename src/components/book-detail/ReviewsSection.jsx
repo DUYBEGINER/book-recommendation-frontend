@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import RatingSummary from './RatingSummary';
-import SectionHeader from '../SectionHeader';
+import SectionHeader from '../common/SectionHeader';
 import ReviewsList from './ReviewsList';
 import ReviewModal from './ReviewModal';
 

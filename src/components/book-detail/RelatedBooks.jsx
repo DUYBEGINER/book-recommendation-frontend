@@ -1,6 +1,6 @@
 import React from 'react'
-import SectionHeader from '../SectionHeader';
-import BookCard from '../BookCard';
+import SectionHeader from '../common/SectionHeader';
+import BookCard from '../common/BookCard';
 
 const RelatedBooks = React.memo(({ books }) => {
   if (!books || books.length === 0) return null;

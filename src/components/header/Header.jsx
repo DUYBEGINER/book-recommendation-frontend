@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import CategoryDropdown from './CategoriesDropdown';
 import ProfilePopover from './ProfilePopover';
 import SearchSuggestions from './SearchSuggestions';
-import useAuth from '../../hook/useAuth';
+import useAuth from '../../hooks/useAuth';
 import { searchBooks } from '../../services/manageBookService';
 
 const Header = ({

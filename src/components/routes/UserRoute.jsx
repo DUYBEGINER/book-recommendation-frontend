@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import useAuth from '../hook/useAuth';
+import useAuth from '../../hooks/useAuth';
 
 /**
  * UserRoute - Protects routes that should only be accessible by regular users

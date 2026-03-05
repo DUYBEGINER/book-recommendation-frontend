@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import AdminLayout from "../../layout/AdminLayout"
+import AdminLayout from "../../layouts/AdminLayout"
 import SearchBar from "../../components/admin/SearchBar"
 import StatusFilter from "../../components/admin/StatusFilter"
 import SortSelect from "../../components/admin/SortSelect"

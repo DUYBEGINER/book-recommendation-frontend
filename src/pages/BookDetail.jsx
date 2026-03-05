@@ -2,18 +2,17 @@
 import React, { useMemo, useCallback, Suspense, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import MainLayout from '../layout/MainLayout';
+import MainLayout from '../layouts/MainLayout';
 import { Breadcrumb } from 'antd';
-import scrollToTop from '../utils/scrollToTop';
+import ScrollToTop from '../components/common/ScrollToTop';
 import {Link} from "react-router-dom";
-import useAuth from '../hook/useAuth';
+import useAuth from '../hooks/useAuth';
 import { useMessage } from '../contexts/MessageProvider';
 import { message as antdMessage } from 'antd';
 import { createOrUpdateRating, getBookRatings, getAverageRatingByBookId } from '../services/ratingService.js';
-import { getBookFavorites, addFavorite, removeFavorite } from '../services/bookFavorite';
+import { getBookFavorites, addFavorite, removeFavorite } from '../services/favoriteService';
 import {getSimilarBooks} from '../services/bookService';
-import { getBooks } from '../services/manageBookService';
-import { useParams } from "react-router-dom";
+import { getBooks } from '../services/manageBookService';import { useParams } from "react-router-dom";
 import { getBookDetail } from '../services/manageBookService';
 // import { API_BASE_URL } from '../config/ApiConfig';
 import { getAccessToken } from '../utils/storage';
@@ -65,7 +64,7 @@ const BookDetail = () => {
   const [avgRating, setAvgRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
   
-  scrollToTop();
+  ScrollToTop();
 
   //Get book ID from URL params
   const { id } = useParams();

@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useRef, useState, useMemo } from "react"
 import { useNavigate } from "react-router-dom";
 
 // Components
-import Hero from "../components/Hero";
-import BookCarousel from "../components/BookCarousel";
-import TopBooksShowcase from "../components/TopBooksShowcase";
+import Hero from "../components/home/Hero";
+import BookCarousel from "../components/common/BookCarousel";
+import TopBooksShowcase from "../components/home/TopBooksShowcase";
 
 // Layout
-import MainLayout from "../layout/MainLayout";
+import MainLayout from "../layouts/MainLayout";
 
 // Services
 import { getBooksByGenre } from "../services/manageBookService";

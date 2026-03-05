@@ -56,7 +56,7 @@ import {
   getAllRedisCaches,
   getRedisKeyValue,
 } from '../../services/recommendationService';
-import AdminLayout from '../../layout/AdminLayout';
+import AdminLayout from '../../layouts/AdminLayout';
 
 const { Text, Paragraph } = Typography;
 const { Panel } = Collapse;

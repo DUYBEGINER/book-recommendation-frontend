@@ -6,8 +6,8 @@ import { ChevronLeft, ChevronRight, Bookmark, BookmarkCheck } from "lucide-react
 
 import SidePanel from "./SidePanel";
 import { AnimatePresence } from "framer-motion";
-import useTheme from "../../hook/useTheme";
-import useAuth from "../../hook/useAuth";
+import useTheme from "../../hooks/useTheme";
+import useAuth from "../../hooks/useAuth";
 
 import { useLocation } from "react-router-dom";
 import { recordReadingHistory } from "../../services/historyService";

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import useAuth from '../../hook/useAuth';
+import useAuth from '../../hooks/useAuth';
 import api from '../../config/ApiConfig';
 import { setAuthData } from '../../utils/storage';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import SectionHeader from '../SectionHeader';
+import SectionHeader from '../common/SectionHeader';
 
 const BookDescription = React.memo(({ description, previewLength = 800 }) => {
   const [showFullDescription, setShowFullDescription] = useState(false);

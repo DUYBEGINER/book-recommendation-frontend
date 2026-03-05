@@ -24,7 +24,7 @@ const TopBooksShowcase = ({ books = [], title = "Top sách nổi bật" }) => {
 
   // Lấy tối đa 4 cuốn sách
   const topBooks = books.slice(0, 4);
-  console.log("TopBooksShowcase received books:", topBooks);
+  
   const BookItem = ({ book, index }) => (
     <div className="w-full sm:w-[calc(50%-0.5rem)] lg:w-auto flex-shrink-0 snap-start">
       <div

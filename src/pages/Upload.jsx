@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { axiosClient } from "../utils/axiousClient";
+import api from "../config/ApiConfig";
 
 export default function UploadDirect() {
   const [file, setFile] = useState(null);
@@ -15,7 +15,7 @@ export default function UploadDirect() {
     fd.append("file", file);
 
     try {
-      const { data } = await axiosClient.post("/upload", fd, {
+      const { data } = await api.post("/upload", fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setMsg(`OK: ${data.key}`);

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { message } from "antd";
-import AdminLayout from "../../layout/AdminLayout";
+import AdminLayout from "../../layouts/AdminLayout";
 import {
   ResponsiveContainer,
   BarChart,
@@ -19,8 +19,8 @@ import {
   Heart,
 } from "lucide-react";
 
-import ListCard from "./components/ListCard";
-import StatCard from "./components/StatCard";
+import ListCard from "../../components/admin/ListCard";
+import StatCard from "../../components/admin/StatCard";
 
 import { getAdminDashboard } from "../../services/dashboardService";
 

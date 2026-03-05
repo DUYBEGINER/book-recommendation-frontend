@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import MainLayout from "../layout/MainLayout";
-import BookCard from "../components/BookCard";
+import MainLayout from "../layouts/MainLayout";
+import BookCard from "../components/common/BookCard";
 import { getGenreById } from "../services/genreService";
 import { getBooksByGenre } from "../services/manageBookService";
 
