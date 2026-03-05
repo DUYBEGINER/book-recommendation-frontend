@@ -1,10 +1,8 @@
-"use client"
-
-// src/components/account/SecurityForm.jsx
 import React, { useState } from "react"
 import { message } from "antd"
 
 const SecurityForm = React.memo(({ user, onChangePassword, isSubmitting }) => {
+  console.log("Rendering SecurityForm with user:", user)
   const [showChangePassword, setShowChangePassword] = useState(false)
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -12,15 +10,18 @@ const SecurityForm = React.memo(({ user, onChangePassword, isSubmitting }) => {
     confirmPassword: "",
   })
 
+  // Handle input changes for password fields
   const handlePasswordChange = (e) => {
     const { name, value } = e.target
     setPasswordData((prev) => ({ ...prev, [name]: value }))
   }
 
+  // Toggle change password form visibility
   const handleChangePasswordClick = () => {
     setShowChangePassword((prev) => !prev)
   }
 
+  // Handle password change form submission
   const handleSubmitPassword = async (e) => {
     e.preventDefault()
 
@@ -44,13 +45,14 @@ const SecurityForm = React.memo(({ user, onChangePassword, isSubmitting }) => {
         currentPassword: passwordData.currentPassword,
         newPassword: passwordData.newPassword,
       })
+      // Reset form
       setPasswordData({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       })
       setShowChangePassword(false)
-    } catch (_) {
+    } catch {
       // Errors are handled upstream in the parent component.
     }
   }

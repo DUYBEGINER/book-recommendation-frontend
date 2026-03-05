@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { History, Loader2 } from "lucide-react";
 import EmptyState from "../../components/account/EmptyState";
 import BookCard from "../../components/common/BookCard";
@@ -8,25 +8,38 @@ import useAuth from "../../hooks/useAuth";
 
 const PAGE_SIZE = 8;
 
+const EMPTY_PAGINATION = {
+  number: 0,
+  size: PAGE_SIZE,
+  totalPages: 0,
+  totalElements: 0,
+};
+
+/**
+ * Format timestamp to Vietnamese locale string.
+ * Pure utility — no component dependency.
+ */
+const formatLastReadTime = (timestamp) => {
+  if (!timestamp) return "";
+  try {
+    return new Date(timestamp).toLocaleString("vi-VN", { hour12: false });
+  } catch {
+    return "";
+  }
+};
+
 const HistorySection = React.memo(() => {
   const { user } = useAuth();
-  const [historyItems, setHistoryItems] = React.useState([]);
-  const [pagination, setPagination] = React.useState({
-    number: 0,
-    size: PAGE_SIZE,
-    totalPages: 0,
-    totalElements: 0,
-  });
-  const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState(null);
+  const [historyItems, setHistoryItems] = useState([]);
+  const [pagination, setPagination] = useState(EMPTY_PAGINATION);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const userId = user?.id;
+  const userId = user?.userId;
 
-  const fetchHistory = React.useCallback(
+  const fetchHistory = useCallback(
     async (pageIndex = 0) => {
-      if (!userId) {
-        return;
-      }
+      if (!userId) return;
 
       setLoading(true);
       setError(null);
@@ -38,32 +51,26 @@ const HistorySection = React.memo(() => {
         });
 
         setHistoryItems(history);
-
-        if (page) {
-          setPagination({
-            number: page.number ?? pageIndex,
-            size: page.size ?? PAGE_SIZE,
-            totalPages: page.totalPages ?? 0,
-            totalElements: page.totalElements ?? history.length,
-          });
-        } else {
-          setPagination({
-            number: pageIndex,
-            size: PAGE_SIZE,
-            totalPages: history.length > 0 ? 1 : 0,
-            totalElements: history.length,
-          });
-        }
+        setPagination(
+          page
+            ? {
+                number: page.number ?? pageIndex,
+                size: page.size ?? PAGE_SIZE,
+                totalPages: page.totalPages ?? 0,
+                totalElements: page.totalElements ?? history.length,
+              }
+            : {
+                number: pageIndex,
+                size: PAGE_SIZE,
+                totalPages: history.length > 0 ? 1 : 0,
+                totalElements: history.length,
+              },
+        );
       } catch (err) {
         console.error("Failed to load reading history:", err);
         setError(err);
         setHistoryItems([]);
-        setPagination({
-          number: 0,
-          size: PAGE_SIZE,
-          totalPages: 0,
-          totalElements: 0,
-        });
+        setPagination(EMPTY_PAGINATION);
       } finally {
         setLoading(false);
       }
@@ -71,39 +78,18 @@ const HistorySection = React.memo(() => {
     [userId],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchHistory(0);
   }, [fetchHistory]);
 
-  const handlePageChange = React.useCallback(
+  const handlePageChange = useCallback(
     (pageNumber) => {
-      if (!pagination.totalPages) {
-        return;
-      }
-
-      if (pageNumber < 1 || pageNumber > pagination.totalPages) {
-        return;
-      }
-
+      if (!pagination.totalPages) return;
+      if (pageNumber < 1 || pageNumber > pagination.totalPages) return;
       fetchHistory(pageNumber - 1);
     },
     [fetchHistory, pagination.totalPages],
   );
-
-  const formatLastReadTime = (timestamp) => {
-    if (!timestamp) {
-      return "";
-    }
-
-    try {
-      return new Date(timestamp).toLocaleString("vi-VN", {
-        hour12: false,
-      });
-    } catch (err) {
-      console.error("Failed to format timestamp:", err);
-      return "";
-    }
-  };
 
   const hasHistory = historyItems.length > 0;
   const showPagination = pagination.totalPages > 1;

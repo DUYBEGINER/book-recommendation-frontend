@@ -1,5 +1,3 @@
-"use client"
-
 import React from "react"
 import { User, Book, History } from "lucide-react"
 import UserAvatar from "./UserAvatar"

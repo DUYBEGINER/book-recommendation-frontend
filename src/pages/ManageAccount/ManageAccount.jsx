@@ -21,8 +21,8 @@ const PATH_TO_TAB = {
 }
 
 const ManageAccount = () => {
-  const { pathname } = useLocation()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const { user } = useAuth()
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
 

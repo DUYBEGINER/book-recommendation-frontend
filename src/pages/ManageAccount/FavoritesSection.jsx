@@ -1,49 +1,60 @@
-import React, { useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import { Book, Trash2 } from "lucide-react"
+import { Modal } from "antd"
 import EmptyState from "../../components/account/EmptyState"
 import BookCard from "../../components/common/BookCard"
-// import books from "../../data/book"
-import { Modal } from "antd"
 import useAuth from "../../hooks/useAuth"
 import { getBookFavorites, removeFavorite } from "../../services/favoriteService"
 import { useMessage } from "../../contexts/MessageProvider"
 import { sendFeedback } from "../../utils/feedbackHelper"
 
 const FavoritesSection = React.memo(() => {
-  const [favoriteBooks, setFavoriteBooks] = React.useState([]);
+  const [favoriteBooks, setFavoriteBooks] = useState([]);
   const message = useMessage();
-
   const { user } = useAuth();
+
+  const userId = user?.userId;
+
   useEffect(() => {
+    if (!userId) return;
     const fetchData = async () => {
       try {
-        const booksData = await getBookFavorites(user.id);
+        const booksData = await getBookFavorites(userId);
         setFavoriteBooks(booksData);
       } catch (error) {
         console.error("Failed to fetch favorite books:", error);
       }
     };
-    if (user?.id) {
-      fetchData();
-    }
-  }, [user?.id])
+    fetchData();
+  }, [userId]);
 
-  // Handle remove favorite
-  const handleRemoveFavorite = async (bookId) => {
+  const handleRemoveFavorite = useCallback(async (bookId) => {
     try {
-      await removeFavorite(user.id, bookId);
+      await removeFavorite(userId, bookId);
       message.success("Đã xóa khỏi yêu thích");
-      // Update UI immediately - filter by bookId or book.id
       setFavoriteBooks(prev => prev.filter(fav => {
         const favBookId = fav.bookId || fav.book?.id || fav.id;
         return favBookId !== bookId;
       }));
-      sendFeedback(user.id, bookId, 'favorite', 0); //Gửi phản hồi xóa yêu thích với giá trị 0 cập nhât model
+      sendFeedback(userId, bookId, 'favorite', 0);
     } catch (error) {
       message.error("Xóa thất bại. Vui lòng thử lại");
       console.error("Remove favorite failed:", error);
     }
-  }
+  }, [userId, message]);
+
+  const confirmRemove = useCallback((book) => {
+    const bookData = book.book || book;
+    const bookId = book.bookId || book.book?.id || book.id;
+    Modal.confirm({
+      title: 'Xác nhận xóa sách yêu thích',
+      content: `Bạn có chắc muốn xóa "${bookData.title}" khỏi danh sách yêu thích không?`,
+      okText: 'Xóa',
+      okType: 'danger',
+      cancelText: 'Hủy',
+      onOk: () => handleRemoveFavorite(bookId),
+    });
+  }, [handleRemoveFavorite]);
 
   if (favoriteBooks.length === 0) {
     return (
@@ -66,23 +77,7 @@ const FavoritesSection = React.memo(() => {
           <div key={book.id} className="relative group">
             <BookCard book={book.book || book} />
             <button
-              onClick={() => {
-                const bookData = book.book || book;
-                const bookId = book.bookId || book.book?.id || book.id;
-                Modal.confirm({
-                  title: 'Xác nhận xóa sách yêu thích',
-                  content: `Bạn có chắc muốn xóa "${bookData.title}" khỏi danh sách yêu thích không?`,
-                  okText: 'Xóa',
-                  okType: 'danger',
-                  cancelText: 'Hủy',
-                  onOk: () => {
-                    handleRemoveFavorite(bookId);
-                  },
-                  onCancel() {
-                    // Người dùng đã hủy, không làm gì cả
-                  },
-                });
-              }}
+              onClick={() => confirmRemove(book)}
               className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600 z-10"
               aria-label="Xóa khỏi yêu thích"
             >

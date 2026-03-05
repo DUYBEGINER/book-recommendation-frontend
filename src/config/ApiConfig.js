@@ -48,7 +48,6 @@ api.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
-    console.log("API request error:", error);
     // Guard: No config means network error or cancelled request
     if (!originalRequest) {
       return Promise.reject(error);
@@ -57,12 +56,6 @@ api.interceptors.response.use(
     const isRefreshEndpoint = originalRequest.url?.includes('/auth/refresh');
     const hasRetried = originalRequest._retry === true;
     const is401Error = error.response?.status === 401;
-    console.log("API response error intercepted:", {
-      url: originalRequest.url,
-      status: error.response?.status,
-      isRefreshEndpoint,
-      hasRetried,
-    });
     // Only attempt refresh for 401 errors, not retried requests, and not refresh endpoint itself
     if (is401Error && !hasRetried && !isRefreshEndpoint) {
       

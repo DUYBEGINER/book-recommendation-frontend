@@ -1,10 +1,9 @@
-// src/components/account/AccountInfoSection.jsx
-import React, { useState, useContext, useEffect, useCallback } from "react";
-import { message } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
 import AccountTabs from "../../components/account/AccountTab";
 import PersonalInfoForm from "../../components/account/PersonalInfoForm";
 import SecurityForm from "../../components/account/SecurityForm";
-import { AuthContext } from "../../contexts/AuthContext";
+import useAuth from "../../hooks/useAuth";
+import { useMessage } from "../../contexts/MessageProvider";
 import {
   getUserProfile,
   changeUserPassword,
@@ -12,84 +11,101 @@ import {
   updateUserProfile,
 } from "../../services/userService";
 
+const SUB_TABS = [
+  { id: "personal", label: "Thông tin cá nhân" },
+  { id: "security", label: "Tài khoản và bảo mật" },
+];
+
 const AccountInfoSection = React.memo(() => {
   const [activeSubTab, setActiveSubTab] = useState("personal");
   const [updatingProfile, setUpdatingProfile] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
-  const { user, loading } = useContext(AuthContext);
-  const [userInfor, setUserInfor] = useState({});
+  const { user, loading } = useAuth();
+  const message = useMessage();
+  const [userInfo, setUserInfo] = useState({});
+
+  const userId = user?.userId;
 
   const fetchUserProfile = useCallback(async () => {
-    if (!user?.userId) return;
+    if (!userId) return;
     try {
-      const profile = await getUserProfile(user.userId);
-      setUserInfor(profile);
+      const profile = await getUserProfile(userId);
+      setUserInfo(profile);
     } catch (error) {
       console.error("Failed to fetch user profile:", error);
       message.error("Không thể tải thông tin tài khoản");
     }
-  }, [user?.userId]);
+  }, [userId, message]);
 
   useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!userId) return;
+      try {
+        const profile = await getUserProfile(userId);
+        setUserInfo(profile);
+      } catch {
+        message.error("Không thể tải thông tin");
+      }
+    };
     fetchUserProfile();
-  }, [fetchUserProfile]);
+    console.log("UseEffect Run!", userId);
+  }, [userId, message]);
 
-  const subTabs = [
-    { id: "personal", label: "Thông tin cá nhân" },
-    { id: "security", label: "Tài khoản và bảo mật" },
-  ];
+  const handleSubmit = useCallback(
+    async (formData) => {
+      if (!userId) return;
+      setUpdatingProfile(true);
+      try {
+        await updateUserProfile(userId, formData);
+        message.success("Cập nhật thông tin thành công");
+        await fetchUserProfile();
+      } catch (error) {
+        const msg = error?.response?.data?.message || "Cập nhật thông tin thất bại";
+        message.error(msg);
+      } finally {
+        setUpdatingProfile(false);
+      }
+    },
+    [userId, fetchUserProfile, message],
+  );
 
-  const handleSubmit = async (formData) => {
-    if (!user) return;
-    setUpdatingProfile(true);
+  const handleAvatarChange = useCallback(
+    async (file) => {
+      if (!userId || !file) return;
+      setUploadingAvatar(true);
+      try {
+        await updateUserAvatar(userId, file);
+        message.success("Cập nhật ảnh đại diện thành công");
+        await fetchUserProfile();
+      } catch (error) {
+        const msg =
+          error?.response?.data?.message || "Cập nhật ảnh đại diện thất bại";
+        message.error(msg);
+      } finally {
+        setUploadingAvatar(false);
+      }
+    },
+    [userId, fetchUserProfile, message],
+  );
 
-    try {
-      await updateUserProfile(user.id, formData);
-      message.success("Cập nhật thông tin thành công");
-      await fetchUserProfile();
-    } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message || "Cập nhật thông tin thất bại";
-      message.error(errorMessage);
-    } finally {
-      setUpdatingProfile(false);
-    }
-  };
-
-  const handleAvatarChange = async (file) => {
-    if (!user || !file) return;
-    setUploadingAvatar(true);
-
-    try {
-      await updateUserAvatar(user.id, file);
-      message.success("Cập nhật ảnh đại diện thành công");
-      await fetchUserProfile();
-    } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message || "Cập nhật ảnh đại diện thất bại";
-      message.error(errorMessage);
-    } finally {
-      setUploadingAvatar(false);
-    }
-  };
-
-  const handlePasswordChange = async ({ currentPassword, newPassword }) => {
-    if (!user) return;
-    setChangingPassword(true);
-
-    try {
-      await changeUserPassword(user.id, { currentPassword, newPassword });
-      message.success("Đổi mật khẩu thành công");
-    } catch (error) {
-      const errorMessage =
-        error?.response?.data?.message || "Đổi mật khẩu thất bại";
-      message.error(errorMessage);
-      throw error;
-    } finally {
-      setChangingPassword(false);
-    }
-  };
+  const handlePasswordChange = useCallback(
+    async ({ currentPassword, newPassword }) => {
+      if (!userId) return;
+      setChangingPassword(true);
+      try {
+        await changeUserPassword(userId, { currentPassword, newPassword });
+        message.success("Đổi mật khẩu thành công");
+      } catch (error) {
+        const msg = error?.response?.data?.message || "Đổi mật khẩu thất bại";
+        message.error(msg);
+        throw error;
+      } finally {
+        setChangingPassword(false);
+      }
+    },
+    [userId, message],
+  );
 
   if (loading && !user) {
     return (
@@ -116,14 +132,14 @@ const AccountInfoSection = React.memo(() => {
       </div>
 
       <AccountTabs
-        tabs={subTabs}
+        tabs={SUB_TABS}
         activeTab={activeSubTab}
         onTabChange={setActiveSubTab}
       />
 
       {activeSubTab === "personal" && (
         <PersonalInfoForm
-          user={userInfor}
+          user={userInfo}
           onSubmit={handleSubmit}
           onAvatarChange={handleAvatarChange}
           isSubmitting={updatingProfile}
@@ -133,7 +149,7 @@ const AccountInfoSection = React.memo(() => {
 
       {activeSubTab === "security" && (
         <SecurityForm
-          user={userInfor}
+          user={userInfo}
           onChangePassword={handlePasswordChange}
           isSubmitting={changingPassword}
         />

@@ -1,6 +1,3 @@
-"use client"
-
-// src/components/account/PersonalInfoForm.jsx
 import React, { useEffect, useRef, useState } from "react"
 import UserAvatar from "./UserAvatar"
 
