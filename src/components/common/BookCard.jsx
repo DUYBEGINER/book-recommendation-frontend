@@ -1,45 +1,122 @@
-"use client"
 import { Pen, Star, Calendar, BookOpen } from "lucide-react"
 import { useNavigate } from "react-router-dom"
-import { useState } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
+import { createPortal } from "react-dom"
 import { getPreviewBook } from "../../services/bookService"
 
-const BookCard = ({ book }) => {
+/**
+ * Calculate tooltip position relative to the trigger element.
+ * Tries right side first, then left, and clamps vertically to viewport.
+ */
+const calcTooltipPosition = (triggerRect, tooltipWidth = 320, tooltipHeight = 280) => {
+  const GAP = 12;
+  const MARGIN = 8;
+  const viewportW = window.innerWidth;
+  const viewportH = window.innerHeight;
+
+  let left, top;
+  let arrowSide = "left"; // arrow points left → tooltip is on the right
+
+  // Try placing on the right
+  if (triggerRect.right + GAP + tooltipWidth + MARGIN <= viewportW) {
+    left = triggerRect.right + GAP;
+  } else if (triggerRect.left - GAP - tooltipWidth >= MARGIN) {
+    // Place on the left
+    left = triggerRect.left - GAP - tooltipWidth;
+    arrowSide = "right";
+  } else {
+    // Fallback: place on the right, clamped
+    left = Math.min(triggerRect.right + GAP, viewportW - tooltipWidth - MARGIN);
+  }
+
+  // Vertically centre on the trigger, clamped to viewport
+  top = triggerRect.top + triggerRect.height / 2 - tooltipHeight / 2;
+  top = Math.max(MARGIN, Math.min(top, viewportH - tooltipHeight - MARGIN));
+
+  return { left, top, arrowSide };
+};
+
+const BookCard = ({ book, className = "" }) => {
   const navigate = useNavigate();
   const [showTooltip, setShowTooltip] = useState(false);
   const [previewBook, setPreviewBook] = useState({});
   const [previewCache, setPreviewCache] = useState({});
-  
-  const fetchPreviewBook = async (bookId) => {
+  const [tooltipPos, setTooltipPos] = useState({ left: 0, top: 0, arrowSide: "left" });
+
+  const cardRef = useRef(null);
+  const tooltipRef = useRef(null);
+  const hoverTimer = useRef(null);
+
+  const updateTooltipPosition = useCallback(() => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const tooltipEl = tooltipRef.current;
+    const tooltipH = tooltipEl ? tooltipEl.offsetHeight : 280;
+    setTooltipPos(calcTooltipPosition(rect, 320, tooltipH));
+  }, []);
+
+  const fetchPreviewBook = useCallback(async (bookId) => {
+    if (!bookId) return;
     try {
-       if (previewCache[bookId]) {
+      if (previewCache[bookId]) {
         setPreviewBook(previewCache[bookId]);
         setShowTooltip(true);
-        return
+        updateTooltipPosition();
+        return;
       }
       const data = await getPreviewBook(bookId);
       setPreviewCache(prev => ({ ...prev, [bookId]: data }));
       setPreviewBook(data);
       setShowTooltip(true);
+      updateTooltipPosition();
     } catch (error) {
       console.error("Failed to fetch book preview:", error);
     }
-  }
+  }, [previewCache, updateTooltipPosition]);
 
+  // Recalculate position on scroll / resize while tooltip is visible
+  useEffect(() => {
+    if (!showTooltip) return;
+    const handleReposition = () => updateTooltipPosition();
+    window.addEventListener("scroll", handleReposition, true);
+    window.addEventListener("resize", handleReposition);
+    return () => {
+      window.removeEventListener("scroll", handleReposition, true);
+      window.removeEventListener("resize", handleReposition);
+    };
+  }, [showTooltip, updateTooltipPosition]);
+
+  // Re-measure after tooltip renders (to get correct height)
+  useEffect(() => {
+    if (showTooltip) updateTooltipPosition();
+  }, [showTooltip, previewBook, updateTooltipPosition]);
+
+  const handleMouseEnter = () => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setTooltipPos(calcTooltipPosition(rect));
+    hoverTimer.current = setTimeout(() => fetchPreviewBook(book.bookId), 200);
+  };
+
+  const handleMouseLeave = () => {
+    clearTimeout(hoverTimer.current);
+    setShowTooltip(false);
+  };
 
   const handleClick = () => {
     navigate(`/books/${book.bookId}`);
-  }
+  };
 
   return (
-    <div 
-      className="min-w-[180px] w-[180px] cursor-pointer flex-shrink-0 relative" 
+    <div
+      ref={cardRef}
+      className={`w-full cursor-pointer relative ${className}`}
       onClick={handleClick}
-      onMouseEnter={() => fetchPreviewBook(book.bookId)}
-      onMouseLeave={() => setShowTooltip(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="relative overflow-hidden rounded-lg shadow-md transition-transform duration-300 hover:scale-105 group">
-        <img src={book.coverImageUrl || "/placeholder.svg"} alt={book.title} className="w-full h-64 object-cover" />
+        <img src={book.coverImageUrl || "/placeholder.svg"} alt={book.title} className="w-full aspect-[3/4] object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
       </div>
       <h3 className="mt-3 font-semibold text-gray-800 dark:text-white line-clamp-2 text-sm">{book.title}</h3>
@@ -48,11 +125,20 @@ const BookCard = ({ book }) => {
         <span className="truncate">{book.authors?.map(a => a.authorName).join(", ") || "-"}</span>
       </p>
 
-      {/* Tooltip */}
-      {showTooltip && (
-        <div className="absolute left-full top-0 ml-4 z-50 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4 pointer-events-none animate-fadeIn">
+      {/* Tooltip via Portal — renders at document.body level to avoid overflow clipping */}
+      {showTooltip && createPortal(
+        <div
+          ref={tooltipRef}
+          className="fixed z-[9999] w-80 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 p-4 pointer-events-none animate-fadeIn"
+          style={{ left: tooltipPos.left, top: tooltipPos.top }}
+        >
           {/* Arrow */}
-          <div className="absolute right-full top-8 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-white dark:border-r-gray-800"></div>
+          {tooltipPos.arrowSide === "left" && (
+            <div className="absolute right-full top-8 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-white dark:border-r-gray-800" />
+          )}
+          {tooltipPos.arrowSide === "right" && (
+            <div className="absolute left-full top-8 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-l-8 border-l-white dark:border-l-gray-800" />
+          )}
           
           <div className="flex gap-4">
             {/* Book Cover */}
@@ -116,7 +202,8 @@ const BookCard = ({ book }) => {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

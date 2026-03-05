@@ -39,7 +39,9 @@ const BookCarousel = ({ books, title, genreId, genreName, subtitle, extraHeader,
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {books.map((book) => (
-            <BookCard key={book.id} book={book} />
+            <div key={book.id} className="min-w-[180px] w-[180px] flex-shrink-0">
+              <BookCard book={book} />
+            </div>
           ))}
         </div>
         

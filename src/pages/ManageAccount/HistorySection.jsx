@@ -17,7 +17,6 @@ const EMPTY_PAGINATION = {
 
 /**
  * Format timestamp to Vietnamese locale string.
- * Pure utility — no component dependency.
  */
 const formatLastReadTime = (timestamp) => {
   if (!timestamp) return "";
@@ -27,6 +26,20 @@ const formatLastReadTime = (timestamp) => {
     return "";
   }
 };
+
+/**
+ * Skeleton card placeholder while data is loading.
+ */
+const BookCardSkeleton = () => (
+  <div className="flex flex-col items-center animate-pulse">
+    <div className="w-[180px]">
+      <div className="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+      <div className="mt-3 h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+      <div className="mt-2 h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+    </div>
+    <div className="mt-2 h-3 bg-gray-200 dark:bg-gray-700 rounded w-24" />
+  </div>
+);
 
 const HistorySection = React.memo(() => {
   const { user } = useAuth();
@@ -105,9 +118,10 @@ const HistorySection = React.memo(() => {
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center py-12 text-gray-500 dark:text-gray-400">
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-          <span>Đang tải lịch sử đọc...</span>
+        <div className="grid gap-4 md:gap-6 xl:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+            <BookCardSkeleton key={i} />
+          ))}
         </div>
       ) : !hasHistory ? (
         <EmptyState icon={History} message="Chưa có lịch sử đọc sách" />
@@ -116,15 +130,20 @@ const HistorySection = React.memo(() => {
           <div className="grid gap-4 md:gap-6 xl:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {historyItems.map((item) => {
               const progressValue = typeof item.progress === "number" ? Math.round(item.progress) : null;
-              const book = item.book ?? {
-                id: item.bookId,
-                title: "Sách",
-                coverImageUrl: "",
-                authors: [],
-              };
+              // Ensure book object always has bookId for BookCard tooltip
+              const book = item.book
+                ? { ...item.book, bookId: item.book.bookId || item.book.id || item.bookId }
+                : {
+                    bookId: item.bookId,
+                    id: item.bookId,
+                    title: "Sách",
+                    coverImageUrl: "",
+                    authors: [],
+                  };
+                  
 
               return (
-                <div key={item.id ?? item.bookId ?? `${book.id}-${item.lastReadAt}`} className="flex flex-col items-center">
+                <div key={item.id ?? item.bookId ?? `${book.bookId}-${item.lastReadAt}`} className="flex flex-col items-center">
                   <div className="relative">
                     <BookCard book={book} />
                     {progressValue !== null && (

@@ -101,7 +101,6 @@ const BookDetail = () => {
     const fetchBooks = async () => {
       try {
         const response = await getSimilarBooks(id, 10);
-        console.log("Fetched similar books for book detail page:", response.data);
         setRelatedBooks(response.data || []);
       } catch (error) {
         console.error("Failed to fetch books for book detail page:", error);

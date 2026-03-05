@@ -88,7 +88,6 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
         clearAuthData();
-        console.log("Clear auth data and redirect to login");
         window.location.href = '/';
         return Promise.reject(err);
       } finally {

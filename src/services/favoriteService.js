@@ -1,9 +1,11 @@
 import api from '../config/ApiConfig.js';
 
-export const getBookFavorites = async (userId) => {
+export const getBookFavorites = async (userId, { page = 0, size = 12 } = {}) => {
     try {
-        const response = await api.get(`/users/${userId}/favorites`);
-        return response.data || response || [];
+        const response = await api.get(`/users/${userId}/favorites`, {
+            params: { page, size },
+        });
+        return response.data || response || {};
     } catch (error) {
         console.error('Get favorites failed:', error.response?.data || error.message);
         throw error;

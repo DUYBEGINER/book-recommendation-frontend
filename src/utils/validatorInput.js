@@ -39,7 +39,6 @@ export function validateLogin(form) {
 export function validateSignup(form) {
   // form: { email, password, confirmPassword, username }
   const errors = {};
-  console.log('Validating form:', form);
   const email = (form.email || "").trim();
   const password = form.password || "";
   const confirmPassword = form.confirmPassword || "";
@@ -47,7 +46,6 @@ export function validateSignup(form) {
 
 
   if (!email || !patterns.email.test(email)) {
-    console.log("Invalid email:", email);
     errors.email = "Email không hợp lệ.";
   }
 

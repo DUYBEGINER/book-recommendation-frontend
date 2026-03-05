@@ -32,25 +32,14 @@ const AccountInfoSection = React.memo(() => {
     try {
       const profile = await getUserProfile(userId);
       setUserInfo(profile);
-    } catch (error) {
-      console.error("Failed to fetch user profile:", error);
+    } catch {
       message.error("Không thể tải thông tin tài khoản");
     }
   }, [userId, message]);
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (!userId) return;
-      try {
-        const profile = await getUserProfile(userId);
-        setUserInfo(profile);
-      } catch {
-        message.error("Không thể tải thông tin");
-      }
-    };
     fetchUserProfile();
-    console.log("UseEffect Run!", userId);
-  }, [userId, message]);
+  }, [fetchUserProfile]);
 
   const handleSubmit = useCallback(
     async (formData) => {
@@ -79,8 +68,7 @@ const AccountInfoSection = React.memo(() => {
         message.success("Cập nhật ảnh đại diện thành công");
         await fetchUserProfile();
       } catch (error) {
-        const msg =
-          error?.response?.data?.message || "Cập nhật ảnh đại diện thất bại";
+        const msg = error?.response?.data?.message || "Cập nhật ảnh đại diện thất bại";
         message.error(msg);
       } finally {
         setUploadingAvatar(false);
@@ -88,6 +76,7 @@ const AccountInfoSection = React.memo(() => {
     },
     [userId, fetchUserProfile, message],
   );
+  console.log("AccountInfoSection render - userInfo:");
 
   const handlePasswordChange = useCallback(
     async ({ currentPassword, newPassword }) => {

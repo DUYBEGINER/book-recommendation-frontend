@@ -71,7 +71,6 @@ const ProfilePopover = ({ user, logout }) => {
   const avatarSrc = user?.avatarUrl || user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop';
 
 
-  console.log("ProfilePopover rendered. Current user:", user);
   return (
     <div className="relative" ref={dropdownRef}>
       {/* User Avatar Button */}

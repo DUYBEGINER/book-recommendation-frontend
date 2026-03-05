@@ -75,7 +75,6 @@ const Register = ({ onModeChange }) => {
     const validationResult = validateSignup(formData);
     
     if (!validationResult.valid) {
-      console.log('Validation errors:', validationResult.errors);
       setErrorInputs(validationResult.errors);
       return;
     }
