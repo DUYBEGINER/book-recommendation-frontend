@@ -19,8 +19,6 @@ const Login = ({ onModeChange, onClose }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-
-
   const message = useMessage(); // use global message
 
   // Handle input changes

@@ -89,17 +89,17 @@ const BookDetail = () => {
   }, [id]);
 
   // Fetch related books
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const response = await getSimilarBooks(id, 10);
-        setRelatedBooks(response.data || []);
-      } catch (error) {
-        console.error("Failed to fetch books for book detail page:", error);
-      }
-    };
-    fetchBooks();
-  }, [id]);
+  // useEffect(() => {
+  //   const fetchBooks = async () => {
+  //     try {
+  //       const response = await getSimilarBooks(id, 10);
+  //       setRelatedBooks(response.data || []);
+  //     } catch (error) {
+  //       console.error("Failed to fetch books for book detail page:", error);
+  //     }
+  //   };
+  //   fetchBooks();
+  // }, [id]);
 
 
   // Use bookData from API or fallback to default
