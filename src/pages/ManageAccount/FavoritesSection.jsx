@@ -1,11 +1,21 @@
 import React, { useState, useEffect, useCallback, useRef } from "react"
 import { Book, Trash2, Loader2 } from "lucide-react"
-import { Modal } from "antd"
+
+// import hooks and contexts
+import useAuth from "../../hooks/useAuth"
+import useMessage from "../../hooks/useMessage";
+
+// import components
 import EmptyState from "../../components/account/EmptyState"
 import BookCard from "../../components/common/BookCard"
-import useAuth from "../../hooks/useAuth"
+
+// Antd components
+import { App } from "antd"
+
+// import services
 import { getBookFavorites, removeFavorite } from "../../services/favoriteService"
-import useMessage from "../../hooks/useMessage";
+
+// import utils
 import { sendFeedback } from "../../utils/feedbackHelper"
 
 const PAGE_SIZE = 10;
@@ -13,6 +23,7 @@ const PAGE_SIZE = 10;
 const FavoritesSection = React.memo(() => {
   const message = useMessage();
   const { user } = useAuth();
+  const { modal } = App.useApp();
   const userId = user?.userId;
 
   const [favoriteBooks, setFavoriteBooks] = useState([]);
@@ -24,7 +35,7 @@ const FavoritesSection = React.memo(() => {
   const loadingRef = useRef(false);
   const sentinelRef = useRef(null);
 
-  const [modal, contextHolder] = Modal.useModal();
+
 
   // Function to fetch favorite books with pagination
   const fetchFavorites = useCallback(async (pageIndex = 0, reset = false) => {
@@ -63,7 +74,6 @@ const FavoritesSection = React.memo(() => {
     fetchFavorites(0, true);
   }, [userId, fetchFavorites]);
 
-  console.log("Render FavoritesSection with", { favoriteBooks, loading, hasMore, pageRef: pageRef.current });
   // Infinite scroll via IntersectionObserver
   useEffect(() => {
     //If has more is false, no need to set up observer
@@ -136,7 +146,6 @@ const FavoritesSection = React.memo(() => {
 
   return (
     <div className="max-h-[800px] overflow-y-auto px-2">
-      {contextHolder}
       <div className="sticky top-0 bg-white pb-1 dark:bg-gray-800 z-20">
         <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 shrink-0">SÁCH YÊU THÍCH</h2>
       </div>

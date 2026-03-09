@@ -28,11 +28,18 @@ input::-webkit-reveal-button {
   animation: fadeIn 0.2s ease-out;
 }
 
-@layer base {
+/* Prevent AntdApp's color from cascading into non-Ant Design elements.
+   AntdApp sets color: var(--ant-color-text) on .ant-app which would otherwise
+   override all descendant text colors via CSS inheritance in dark mode. */
+.ant-app {
+  color: inherit;
+}
+
+/* @layer base {
   html.dark {
     color-scheme: dark;
   }
-}
+} */
 
 @theme {
 

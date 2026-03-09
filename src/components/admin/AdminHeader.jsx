@@ -1,10 +1,10 @@
 import { Moon, Sun } from "lucide-react"
 import { Button } from "antd"
-import useTheme from "../../hooks/useTheme"
+import {useThemeContext} from "../../hooks/useTheme"
 import useAuth from "../../hooks/useAuth"
 
 const AdminHeader = ({ title = "ADMIN" }) => {
-  const [theme, setTheme] = useTheme()
+  const { theme, setTheme } = useThemeContext()
   const { logout } = useAuth()
 
   const toggleTheme = () => {

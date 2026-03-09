@@ -6,7 +6,7 @@ import { ChevronLeft, ChevronRight, Bookmark, BookmarkCheck } from "lucide-react
 
 import SidePanel from "./SidePanel";
 import { AnimatePresence } from "framer-motion";
-import useTheme from "../../hooks/useTheme";
+import { useThemeContext } from "../../hooks/useTheme";
 import useAuth from "../../hooks/useAuth";
 
 import { useLocation } from "react-router-dom";
@@ -25,7 +25,7 @@ const DEFAULT_BM_KEY = "reader:bookmarks";
 
 
 export default function EpubCoreViewer({ onBack }) {
-  const [theme, setTheme] = useTheme();
+  const { theme, setTheme } = useThemeContext();
   const locationState = useLocation();
   const { user } = useAuth();
 

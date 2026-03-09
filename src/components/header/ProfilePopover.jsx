@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { User, Book, History, Moon, LogOut, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from "antd";
-import useTheme  from '../../hooks/useTheme';
-import { AnimatePresence, motion } from 'framer-motion';
+import {useThemeContext}  from '../../hooks/useTheme';
+import { AnimatePresence, motion} from 'framer-motion';
 
 const ProfilePopover = ({ user, logout }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,7 +11,7 @@ const ProfilePopover = ({ user, logout }) => {
   const navigate = useNavigate();
   
   // Theme management
-  const [theme, setTheme] = useTheme();
+  const { theme, setTheme } = useThemeContext();
 
   const handleThemeChange = (checked) => {
     setTheme(checked ? 'dark' : 'light');

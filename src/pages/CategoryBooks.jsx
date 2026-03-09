@@ -120,6 +120,7 @@ Pagination.displayName = "Pagination";
 
 const CategoryBooks = () => {
   const { categoryId } = useParams();
+  console.log("CategoryBooks rendered with categoryId:", categoryId);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const initialCategoryName = searchParams.get("name") || "Thể loại";

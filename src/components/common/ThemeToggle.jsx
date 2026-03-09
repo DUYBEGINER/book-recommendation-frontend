@@ -1,18 +1,12 @@
 import React from 'react';
-import useTheme from '../../hooks/useTheme';
+import { useThemeContext } from '../../hooks/useTheme';
 
 const ThemeToggle = () => {
-  const [theme, setTheme] = useTheme();
+  const { setTheme, isDark } = useThemeContext();
 
   const toggleTheme = () => {
-    if (theme === 'dark') {
-      setTheme('light');
-    } else {
-      setTheme('dark');
-    }
+    setTheme(isDark ? 'light' : 'dark');
   };
-
-  const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   return (
     <button

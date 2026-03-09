@@ -64,7 +64,7 @@ const Login = ({ onModeChange, onClose }) => {
 
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-m">
       <h2 className="text-2xl font-bold text-center mb-6">Đăng nhập</h2>
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">

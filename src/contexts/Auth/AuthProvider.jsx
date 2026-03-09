@@ -5,9 +5,9 @@ import {
   register as registerService,
   logout as logoutService,
   getUser,
-} from "../services/authService";
+} from "../../services/authService";
 import { AuthContext } from "./AuthContext";
-import { clearAuthData, getAccessToken, setAuthData } from "../utils/storage";
+import { clearAuthData, getAccessToken, setAuthData } from "../../utils/storage";
 
 /**
  * Authentication Provider Component
