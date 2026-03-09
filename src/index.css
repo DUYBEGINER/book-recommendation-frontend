@@ -28,6 +28,12 @@ input::-webkit-reveal-button {
   animation: fadeIn 0.2s ease-out;
 }
 
+@layer base {
+  html.dark {
+    color-scheme: dark;
+  }
+}
+
 @theme {
 
   --color-primary: #BF2C24;

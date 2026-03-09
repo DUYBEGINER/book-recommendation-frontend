@@ -24,6 +24,8 @@ const FavoritesSection = React.memo(() => {
   const loadingRef = useRef(false);
   const sentinelRef = useRef(null);
 
+  const [modal, contextHolder] = Modal.useModal();
+
   // Function to fetch favorite books with pagination
   const fetchFavorites = useCallback(async (pageIndex = 0, reset = false) => {
     if (!userId || loadingRef.current) return;
@@ -101,7 +103,7 @@ const FavoritesSection = React.memo(() => {
   const confirmRemove = useCallback((book) => {
     const bookData = book.book || book;
     const bookId = book.bookId || book.book?.id || book.id;
-    Modal.confirm({
+    modal.confirm({
       title: 'Xác nhận xóa sách yêu thích',
       content: `Bạn có chắc muốn xóa "${bookData.title}" khỏi danh sách yêu thích không?`,
       okText: 'Xóa',
@@ -109,7 +111,7 @@ const FavoritesSection = React.memo(() => {
       cancelText: 'Hủy',
       onOk: () => handleRemoveFavorite(bookId),
     });
-  }, [handleRemoveFavorite]);
+  }, [handleRemoveFavorite, modal]);
 
   if (initialLoading) {
     return (
@@ -133,9 +135,11 @@ const FavoritesSection = React.memo(() => {
   }
 
   return (
-    <div>
-      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 shrink-0">SÁCH YÊU THÍCH</h2>
-
+    <div className="max-h-[800px] overflow-y-auto px-2">
+      {contextHolder}
+      <div className="sticky top-0 bg-white pb-1 dark:bg-gray-800 z-20">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 shrink-0">SÁCH YÊU THÍCH</h2>
+      </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 py-4">
         {favoriteBooks.map((book) => (
           <div key={book.id} className="relative group flex justify-center">

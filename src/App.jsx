@@ -32,6 +32,7 @@ import EpubCoreViewer from "./pages/BookReader/BookReader.jsx"
 function App() {
   return (
     <AuthProvider>
+
       <Routes>
         {/* User Routes - Admin will be redirected to /admin */}
         <Route 
