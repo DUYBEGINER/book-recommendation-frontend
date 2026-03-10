@@ -43,15 +43,22 @@ const AdminEditbook = () => {
           }),
           getBookDetail(id),
         ]);
+        console.log("Loaded genres:", genres);
 
-        setGenreOptions(genres);
+        setGenreOptions(genres.map((genre) => (
+          { 
+            id: genre.genreId, 
+            name: genre.genreName 
+          }
+        )));
 
         if (book) {
+          console.log("Loaded book:", book);
           const authorNames = book.authors
-            ? Array.from(book.authors).map((author) => author.name)
+            ? Array.from(book.authors).map((author) => author.authorName)
             : [];
           const genreIds = book.genres
-            ? Array.from(book.genres).map((genre) => genre.id)
+            ? Array.from(book.genres).map((genre) => genre.genreId)
             : [];
 
           form.setFieldsValue({

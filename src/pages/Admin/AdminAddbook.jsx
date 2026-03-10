@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Form, Input, Select, Button, Upload, message, ConfigProvider } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  Button,
+  Upload,
+  message,
+  ConfigProvider,
+} from "antd";
 import {
   ArrowLeftOutlined,
   DeleteOutlined,
   CloseCircleOutlined,
 } from "@ant-design/icons";
-import { Camera, File} from "lucide-react";
+import { Camera, File } from "lucide-react";
 import AdminLayout from "../../layouts/AdminLayout";
 import { PATHS } from "../../constants/routePaths";
 import { createBook } from "../../services/manageBookService";
@@ -31,7 +39,12 @@ const AdminAddbook = () => {
       setGenresLoading(true);
       try {
         const { genres } = await getGenres({ size: 100 });
-        setGenreOptions(genres);
+        setGenreOptions(
+          genres.map((g) => ({
+            id: g.genreId,
+            name: g.genreName,
+          })),
+        );
       } catch (error) {
         message.error("Không thể tải danh sách thể loại!");
         console.error("[ADMIN ADD_BOOK] Lỗi tải thể loại:", error);
@@ -46,7 +59,6 @@ const AdminAddbook = () => {
   const handleBack = () => {
     navigate(-1);
   };
-
 
   const handleCoverImageUpload = (file) => {
     const isImage = file.type.startsWith("image/");
@@ -70,7 +82,9 @@ const AdminAddbook = () => {
   };
 
   const handlePdfUpload = (file) => {
-    const isPdf = file.type === "application/pdf" || file.name?.toLowerCase().endsWith(".pdf");
+    const isPdf =
+      file.type === "application/pdf" ||
+      file.name?.toLowerCase().endsWith(".pdf");
     if (!isPdf) {
       message.error("Chỉ được tải lên file PDF!");
       return false;
@@ -140,7 +154,9 @@ const AdminAddbook = () => {
       return;
     }
 
+    // Prepare form data for submission
     const formData = new FormData();
+
     formData.append("title", values.title.trim());
     formData.append("description", values.description.trim());
 
@@ -166,6 +182,7 @@ const AdminAddbook = () => {
 
     setSubmitting(true);
     try {
+      console.log("Submitting new book with data:", formData);
       const response = await createBook(formData);
       message.success(response.message || "Thêm sách thành công!");
       form.resetFields();
@@ -175,7 +192,8 @@ const AdminAddbook = () => {
       navigate(PATHS.ADMIN.BOOKS);
     } catch (error) {
       message.error(
-        error.response?.data?.message || "Không thể lưu sách, vui lòng thử lại!",
+        error.response?.data?.message ||
+          "Không thể lưu sách, vui lòng thử lại!",
       );
     } finally {
       setSubmitting(false);
@@ -487,7 +505,9 @@ const AdminAddbook = () => {
                     </div>
                   ) : (
                     <div className="py-20">
-                      <div className="text-gray-300 text-6xl mb-4"><Camera className=" mx-auto" size={48} /></div>
+                      <div className="text-gray-300 text-6xl mb-4">
+                        <Camera className=" mx-auto" size={48} />
+                      </div>
                       <p className="text-gray-600">Tải ảnh lên</p>
                     </div>
                   )}
