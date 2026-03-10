@@ -11,15 +11,6 @@ import { Plus, Trash2 } from "lucide-react"
 import { PATHS } from "../../constants/routePaths"
 import { deleteBook as deleteBookApi, deleteBooksBulk, getAdminBooks } from "../../services/manageBookService"
 
-// const mockBooks = Array.from({ length: 10 }, (_, i) => ({
-//   id: i + 1,
-//   title: "We Are Voulhire",
-//   author: "Matthew Tysz",
-//   genre: "Romance",
-//   publisher: "ABCXYZ",
-//   uploadDate: "29/10/2025",
-// }))
-
 const AdminBooks = () => {
   const navigate = useNavigate()
   const [bookData, setBookData] = useState([]);

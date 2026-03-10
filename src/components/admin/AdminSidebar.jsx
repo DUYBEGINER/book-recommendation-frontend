@@ -25,7 +25,6 @@ const AdminSidebar = () => {
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = location.pathname === item.path
-          console.log(`Rendering nav item: ${item.label}, isActive: ${isActive}`)
           return (
             <Link
               key={item.path}

@@ -50,7 +50,7 @@ const BookDetail = () => {
   const ratingStats = useMemo(() => bookData ? {
     averageRating: bookData.averageRating ?? 0,
     totalReviews: bookData.totalReviews ?? 0,
-  } : null, [bookData?.averageRating, bookData?.totalReviews]);
+  } : null, [bookData]);
 
   const { reviews, avgRating, totalReviews, hasMore, loadingMore, loadMore, handleReviewSubmit } = useBookReviews(book?.id, ratingStats);
 

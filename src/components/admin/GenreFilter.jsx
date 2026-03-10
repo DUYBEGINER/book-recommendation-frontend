@@ -25,8 +25,8 @@ const GenreFilter = ({ value, onChange, className = "" }) => {
   const options = [
     { value: "", label: "Tất cả thể loại" },
     ...genres.map(genre => ({
-      value: genre.id,
-      label: genre.name
+      value: genre.genreId,
+      label: genre.genreName
     }))
   ]
 

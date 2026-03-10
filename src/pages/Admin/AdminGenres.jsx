@@ -1,16 +1,16 @@
-"use client"
 import { useState, useEffect, useRef } from "react"
 import AdminLayout from "../../layouts/AdminLayout"
 import SearchBar from "../../components/admin/SearchBar"
 import GenreTable from "../../components/admin/GenreTable"
-import { Button, Modal, Form, Input, message } from "antd"
+import { Button, Modal, Form, Input } from "antd"
 import { Plus } from "lucide-react"
 import { getGenres, createGenre, updateGenre, deleteGenre } from "../../services/genreService"
-
+import  useMessage  from "../../hooks/useMessage"
 const { TextArea } = Input
 
 const AdminGenres = () => {
   const [genres, setGenres] = useState([])
+  const message = useMessage()
   const [searchQuery, setSearchQuery] = useState("")
   const [pagination, setPagination] = useState({
     current: 1,
@@ -36,7 +36,7 @@ const AdminGenres = () => {
       const pageData = response.page
       const genreList = pageData?.content ?? response.genres ?? []
 
-      setGenres(genreList)
+      setGenres(genreList)  
       setPagination({
         current: (pageData?.number ?? page) + 1,
         pageSize: pageData?.size ?? size,
@@ -49,6 +49,13 @@ const AdminGenres = () => {
       setLoading(false)
     }
   }
+
+  // Normalize genres for the table component
+  const genresData = genres.map((genre) => ({
+    id: genre.genreId,
+    name: genre.genreName,
+    description: genre.description || "",
+  }))
 
   useEffect(() => {
     fetchGenres(0, pagination.pageSize, searchQuery)
@@ -175,7 +182,7 @@ const AdminGenres = () => {
         </div>
 
         <GenreTable 
-          genres={genres}
+          genres={genresData}
           onEdit={handleEditGenre}
           onDelete={handleDeleteGenre}
           pagination={paginationConfig}

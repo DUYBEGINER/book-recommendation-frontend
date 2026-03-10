@@ -15,7 +15,7 @@ export const getGenres = async ({ page = 0, size = 50, keyword = "", sort = "" }
       params.sort = sort.trim();
     }
 
-    const response = await api.get("/books/genres", { params });
+    const response = await api.get("/admin/books/genres", { params });
 
     const pageData = response.data || response || null;
     return {
