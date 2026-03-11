@@ -241,10 +241,8 @@ const AdminBooks = () => {
             options={sortOptions}
             placeholder="Sắp xếp theo"
           />
-        </div>
-
-        {selectedBookIds.length > 0 && (
-          <div className="flex justify-end">
+          {selectedBookIds.length > 0 && (
+          <div className="flex sm:ml-auto items-center">
             <Button
               danger
               onClick={handleBulkDeleteClick}
@@ -254,7 +252,10 @@ const AdminBooks = () => {
               Xóa tất cả ({selectedBookIds.length})
             </Button>
           </div>
-        )}
+          )}
+        </div>
+
+        
 
         <BookTable
           books={bookData}
