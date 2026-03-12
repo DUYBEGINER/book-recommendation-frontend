@@ -1,77 +1,88 @@
-import { useState, useEffect, useRef } from "react"
-import AdminLayout from "../../layouts/AdminLayout"
-import SearchBar from "../../components/admin/SearchBar"
-import StatusFilter from "../../components/admin/StatusFilter"
-import SortSelect from "../../components/admin/SortSelect"
-import UserTable from "../../components/admin/UserTable"
-import { Button, Modal, message } from "antd"
-import { getUser, banUser, unbanUser, banUsersBulk } from "../../services/manageUserService"
-import { Ban } from "lucide-react"
+import { useState, useEffect, useRef } from "react";
+import AdminLayout from "../../layouts/AdminLayout";
+import SearchBar from "../../components/admin/SearchBar";
+import StatusFilter from "../../components/admin/StatusFilter";
+import SortSelect from "../../components/admin/SortSelect";
+import UserTable from "../../components/admin/UserTable";
+import { Button, Modal, message } from "antd";
+import {
+  getUser,
+  banUser,
+  unbanUser,
+  banUsersBulk,
+} from "../../services/manageUserService";
+import { Ban } from "lucide-react";
 
 const normalizeStatus = (status) => {
   if (!status) {
-    return 'UNKNOWN';
+    return "UNKNOWN";
   }
-  if (typeof status === 'string') {
+  if (typeof status === "string") {
     return status.trim().toUpperCase();
   }
-  if (typeof status === 'object') {
-    if (typeof status.name === 'string') {
+  if (typeof status === "object") {
+    if (typeof status.name === "string") {
       return status.name.trim().toUpperCase();
     }
-    if (typeof status.value === 'string') {
+    if (typeof status.value === "string") {
       return status.value.trim().toUpperCase();
     }
   }
-  return 'UNKNOWN';
+  return "UNKNOWN";
 };
 
 const AdminUsers = () => {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("")
-  const [sortBy, setSortBy] = useState("newest")
-  const [users, setUsers] = useState([])
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [sortBy, setSortBy] = useState("newest");
+  const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({
     current: 1,
     pageSize: 10,
     total: 0,
-  })
-  const [loading, setLoading] = useState(false)
-  const searchInitialized = useRef(false)
-  const filterInitialized = useRef(false)
-  const sortInitialized = useRef(false)
+  });
+  const [loading, setLoading] = useState(false);
+  const searchInitialized = useRef(false);
+  const filterInitialized = useRef(false);
+  const sortInitialized = useRef(false);
 
   const fetchUsers = async (
     page = 0,
     size = pagination.pageSize,
     keywordParam = searchQuery,
     statusParam = statusFilter,
-    sortParam = sortBy
+    sortParam = sortBy,
   ) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await getUser(page, size, keywordParam, statusParam, sortParam)
-      const data = response.data || response
-      const content = data?.content || []
+      const response = await getUser(
+        page,
+        size,
+        keywordParam,
+        statusParam,
+        sortParam,
+      );
+      const data = response.data || response;
+      const content = data?.content || [];
 
-      const normalizedContent = content.map(user => ({
+      const normalizedContent = content.map((user) => ({
         ...user,
         status: normalizeStatus(user.status),
-      }))
+      }));
 
-      setUsers(normalizedContent)
+      setUsers(normalizedContent);
       setPagination({
         current: (data?.number ?? page) + 1,
         pageSize: data?.size ?? size,
         total: data?.totalElements ?? 0,
-      })
+      });
     } catch (error) {
-      console.error("Error fetching users:", error)
-      message.error("Không thể tải danh sách người dùng")
+      console.error("Error fetching users:", error);
+      message.error("Không thể tải danh sách người dùng");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     fetchUsers(0, pagination.pageSize, searchQuery, statusFilter, sortBy);
@@ -85,12 +96,12 @@ const AdminUsers = () => {
     }
 
     const handler = setTimeout(() => {
-      fetchUsers(0, pagination.pageSize, searchQuery, statusFilter, sortBy)
-    }, 400)
+      fetchUsers(0, pagination.pageSize, searchQuery, statusFilter, sortBy);
+    }, 400);
 
-    return () => clearTimeout(handler)
+    return () => clearTimeout(handler);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery])
+  }, [searchQuery]);
 
   useEffect(() => {
     if (!filterInitialized.current) {
@@ -98,9 +109,9 @@ const AdminUsers = () => {
       return;
     }
 
-    fetchUsers(0, pagination.pageSize, searchQuery, statusFilter, sortBy)
+    fetchUsers(0, pagination.pageSize, searchQuery, statusFilter, sortBy);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter])
+  }, [statusFilter]);
 
   useEffect(() => {
     if (!sortInitialized.current) {
@@ -108,97 +119,112 @@ const AdminUsers = () => {
       return;
     }
 
-    fetchUsers(0, pagination.pageSize, searchQuery, statusFilter, sortBy)
+    fetchUsers(0, pagination.pageSize, searchQuery, statusFilter, sortBy);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sortBy])
+  }, [sortBy]);
 
   // Handle table change (pagination, filters, sorter)
   const handleTableChange = (paginationConfig) => {
-    const page = paginationConfig.current - 1 // Convert to 0-based
-    const size = paginationConfig.pageSize
-    fetchUsers(page, size, searchQuery, statusFilter, sortBy)
-  }
+    const page = paginationConfig.current - 1; // Convert to 0-based
+    const size = paginationConfig.pageSize;
+    fetchUsers(page, size, searchQuery, statusFilter, sortBy);
+  };
 
-  const [isBanModalOpen, setIsBanModalOpen] = useState(false)
-  const [selectedUser, setSelectedUser] = useState(null)
-  const [selectedUserIds, setSelectedUserIds] = useState([])
-  const [isBulkBanModalOpen, setIsBulkBanModalOpen] = useState(false)
-  const [pendingBulkUserIds, setPendingBulkUserIds] = useState([])
+  const [isBanModalOpen, setIsBanModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [isBulkBanModalOpen, setIsBulkBanModalOpen] = useState(false);
+  const [pendingBulkUserIds, setPendingBulkUserIds] = useState([]);
 
   // Handle lock user action
   const handleLockUser = (user) => {
-    setSelectedUser(user)
-    setIsBanModalOpen(true)
-  }
+    setSelectedUser(user);
+    setIsBanModalOpen(true);
+  };
 
   const confirmBan = async () => {
     if (!selectedUser) {
-      return
+      return;
     }
 
     try {
       if (selectedUser.status === "BANNED") {
-        await unbanUser(selectedUser.id)
-        message.success("Bỏ chặn người dùng thành công!")
+        await unbanUser(selectedUser.id);
+        message.success("Bỏ chặn người dùng thành công!");
       } else {
-        await banUser(selectedUser.id)
-        message.success("Chặn người dùng thành công!")
+        await banUser(selectedUser.id);
+        message.success("Chặn người dùng thành công!");
       }
-      setIsBanModalOpen(false)
-      setSelectedUser(null)
-      setSelectedUserIds((prev) => prev.filter((id) => id !== selectedUser.id))
-      fetchUsers(pagination.current - 1, pagination.pageSize, searchQuery, statusFilter, sortBy)
+      setIsBanModalOpen(false);
+      setSelectedUser(null);
+      setSelectedUserIds((prev) => prev.filter((id) => id !== selectedUser.id));
+      fetchUsers(
+        pagination.current - 1,
+        pagination.pageSize,
+        searchQuery,
+        statusFilter,
+        sortBy,
+      );
     } catch (error) {
-      message.error("Cập nhật trạng thái người dùng thất bại!")
-      console.error("Error updating user status:", error)
+      message.error("Cập nhật trạng thái người dùng thất bại!");
+      console.error("Error updating user status:", error);
     }
-  }
+  };
 
   const cancelBan = () => {
-    setIsBanModalOpen(false)
-    setSelectedUser(null)
-  }
+    setIsBanModalOpen(false);
+    setSelectedUser(null);
+  };
 
   const handleUserSelectionChange = (selectedKeys) => {
-    setSelectedUserIds(selectedKeys)
-  }
+    setSelectedUserIds(selectedKeys);
+  };
 
   const handleBulkBanClick = () => {
-    if (!selectedUserIds.length) return
-    setPendingBulkUserIds(selectedUserIds)
-    setIsBulkBanModalOpen(true)
-  }
+    if (!selectedUserIds.length) return;
+    setPendingBulkUserIds(selectedUserIds);
+    setIsBulkBanModalOpen(true);
+  };
 
   const confirmBulkBan = async () => {
     if (!pendingBulkUserIds.length) {
-      return
+      return;
     }
 
     try {
-      await banUsersBulk(pendingBulkUserIds)
-      message.success(`Chặn ${pendingBulkUserIds.length} người dùng thành công!`)
-      setIsBulkBanModalOpen(false)
-      setPendingBulkUserIds([])
-      setSelectedUserIds([])
-      fetchUsers(pagination.current - 1, pagination.pageSize, searchQuery, statusFilter, sortBy)
+      await banUsersBulk(pendingBulkUserIds);
+      message.success(
+        `Chặn ${pendingBulkUserIds.length} người dùng thành công!`,
+      );
+      setIsBulkBanModalOpen(false);
+      setPendingBulkUserIds([]);
+      setSelectedUserIds([]);
+      fetchUsers(
+        pagination.current - 1,
+        pagination.pageSize,
+        searchQuery,
+        statusFilter,
+        sortBy,
+      );
     } catch (error) {
-      message.error("Chặn người dùng thất bại!")
-      console.error("Error banning users:", error)
+      message.error("Chặn người dùng thất bại!");
+      console.error("Error banning users:", error);
     }
-  }
+  };
 
   const cancelBulkBan = () => {
-    setIsBulkBanModalOpen(false)
-    setPendingBulkUserIds([])
-  }
+    setIsBulkBanModalOpen(false);
+    setPendingBulkUserIds([]);
+  };
 
   // Pagination configuration for UserTable
   const paginationConfig = {
     ...pagination,
     position: ["bottomCenter"],
     showSizeChanger: false,
-    showTotal: (total, range) => `${range[0]}-${range[1]} của ${total} người dùng`,
-  }
+    showTotal: (total, range) =>
+      `${range[0]}-${range[1]} của ${total} người dùng`,
+  };
 
   const sortOptions = [
     { value: "newest", label: "Mới nhất" },
@@ -207,36 +233,39 @@ const AdminUsers = () => {
     { value: "name-desc", label: "Tên Z-A" },
     { value: "email-asc", label: "Email A-Z" },
     { value: "email-desc", label: "Email Z-A" },
-  ]
+  ];
 
   return (
     <AdminLayout title="ADMIN">
       <div className="space-y-6">
-        <SearchBar value={searchQuery} onChange={setSearchQuery} placeholder="Tìm kiếm..." />
-        
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Tìm kiếm..."
+        />
+
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <StatusFilter value={statusFilter} onChange={setStatusFilter} />
-          <SortSelect 
-            value={sortBy} 
-            onChange={setSortBy} 
+          <SortSelect
+            value={sortBy}
+            onChange={setSortBy}
             options={sortOptions}
             placeholder="Sắp xếp theo"
           />
+          {selectedUserIds.length > 0 && (
+            <div className="flex sm:ml-auto items-center">
+              <Button
+                type="primary"
+                danger
+                onClick={handleBulkBanClick}
+                className="flex items-center gap-2"
+              >
+                <Ban className="w-4 h-4" />
+                Chặn tất cả ({selectedUserIds.length})
+              </Button>
+            </div>
+          )}
         </div>
-        
-        {selectedUserIds.length > 0 && (
-          <div className="flex justify-end">
-            <Button
-              type="primary"
-              danger
-              onClick={handleBulkBanClick}
-              className="flex items-center gap-2"
-            >
-              <Ban className="w-4 h-4" />
-              Chặn tất cả ({selectedUserIds.length})
-            </Button>
-          </div>
-        )}
 
         <UserTable
           users={users}
@@ -263,13 +292,19 @@ const AdminUsers = () => {
       </Modal>
 
       <Modal
-        title={selectedUser?.status === "BANNED" ? "Bỏ chặn người dùng" : "Chặn người dùng"}
+        title={
+          selectedUser?.status === "BANNED"
+            ? "Bỏ chặn người dùng"
+            : "Chặn người dùng"
+        }
         open={isBanModalOpen}
         onOk={confirmBan}
         onCancel={cancelBan}
         okText="Có"
         cancelText="Không"
-        okButtonProps={selectedUser?.status === "BANNED" ? {} : { danger: true }}
+        okButtonProps={
+          selectedUser?.status === "BANNED" ? {} : { danger: true }
+        }
         centered
       >
         <p>
@@ -279,7 +314,7 @@ const AdminUsers = () => {
         </p>
       </Modal>
     </AdminLayout>
-  )
-}
+  );
+};
 
-export default AdminUsers
+export default AdminUsers;

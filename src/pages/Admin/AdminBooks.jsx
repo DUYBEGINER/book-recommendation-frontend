@@ -7,7 +7,7 @@ import GenreFilter from "../../components/admin/GenreFilter"
 import SortSelect from "../../components/admin/SortSelect"
 import BookTable from "../../components/admin/BookTable"
 import { Button, Modal, message } from "antd"
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, EyeOff } from "lucide-react"
 import { PATHS } from "../../constants/routePaths"
 import { deleteBook as deleteBookApi, deleteBooksBulk, getAdminBooks } from "../../services/manageBookService"
 
@@ -248,14 +248,12 @@ const AdminBooks = () => {
               onClick={handleBulkDeleteClick}
               className="flex items-center gap-2"
             >
-              <Trash2 className="w-4 h-4" />
-              Xóa tất cả ({selectedBookIds.length})
+              <EyeOff className="w-4 h-4" />
+              Ẩn tất cả ({selectedBookIds.length})
             </Button>
           </div>
           )}
         </div>
-
-        
 
         <BookTable
           books={bookData}
@@ -270,7 +268,7 @@ const AdminBooks = () => {
       </div>
 
       <Modal
-        title="Xóa nhiều sách"
+        title="Ẩn nhiều sách"
         open={isBulkDeleteModalOpen}
         onOk={confirmBulkDelete}
         onCancel={cancelBulkDelete}
@@ -279,11 +277,11 @@ const AdminBooks = () => {
         okButtonProps={{ danger: true }}
         centered
       >
-        <p>Bạn muốn xóa {pendingBulkIds.length} sách đã chọn?</p>
+        <p>Bạn muốn ẩn {pendingBulkIds.length} sách đã chọn?</p>
       </Modal>
 
       <Modal
-        title="Xóa sách"
+        title="Ẩn sách"
         open={isDeleteModalOpen}
         onOk={confirmDelete}
         onCancel={cancelDelete}
@@ -292,7 +290,7 @@ const AdminBooks = () => {
         okButtonProps={{ danger: true }}
         centered
       >
-        <p>Bạn muốn xóa sách này?</p>
+        <p>Bạn muốn ẩn sách này?</p>
       </Modal>
     </AdminLayout>
   )

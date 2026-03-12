@@ -43,17 +43,43 @@ input::-webkit-reveal-button {
 
 @theme {
 
-  --color-primary: #BF2C24;
-  --color-primary-hover: #9b231c;
-  --color-secondary: #FAE0E0;
-  --color-secondary-hover: #d6a6a6;
-  --color-background: #F4F2EF;
-  --color-text: #111827;
+--color-primary: #BF2C24;
+--color-primary-hover: #9b231c;
+--color-secondary: #FAE0E0;
+--color-secondary-hover: #d6a6a6;
+--color-background: #F4F2EF;
+--color-text: #111827;
 
-  --color-gray-sidebar: #0B0B0B;
+--color-gray-sidebar: #0B0B0B;
 
-  --color-sidebar-admin-bg: #152259;
-  --color-sidebar-admin-items: #509CDB;
+--color-sidebar-admin-bg: #FFFFFF;
+--color-sidebar-admin-bg-dark: #152259;
 
-  --font-sekuya: "Sekuya", sans-serif;
+
+--color-sidebar-admin-text: #615BE1;
+--color-sidebar-admin-items-text: #5D7194;
+--color-sidebar-admin-items-hover: #E2E1FA;
+--color-sidebar-admin-items-active: #E5E4FA;
+--color-sidebar-admin-items-active-text: #3333A8;
+--color-sidebar-admin-items-active-border: #AAA8EF;
+
+/* Dark Mode Colors (Slate/Indigo Tone) */
+
+/* Overall sidebar background */
+--color-sidebar-admin-bg-dark: #0F172A; 
+
+/* Logo and Main Title */
+--color-sidebar-admin-text-dark: #F8FAFC; /* Bright white, highly prominent */
+
+/* Default State (Unselected) */
+--color-sidebar-admin-items-text-dark: #94A3B8; /* Light gray, readable but not overpowering */
+--color-sidebar-admin-items-hover-dark: #1E293B; /* Dark slate background on hover */
+
+/* Active State (Selected) */
+--color-sidebar-admin-items-active-dark: #312E81; /* Deep indigo background (creates depth) */
+--color-sidebar-admin-items-active-text-dark: #818CF8; /* Bright indigo text (pops against the dark background) */
+--color-sidebar-admin-items-active-border-dark: #6366F1; /* Prominent indigo border */
+   
+
+--font-sekuya: "Sekuya", sans-serif;
 }

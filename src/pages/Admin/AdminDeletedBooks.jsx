@@ -53,6 +53,7 @@ const columns = (onDelete) => [
     key: "action",
     render: (_, record) => (
       <button
+        title = "Xóa vĩnh viễn sách"
         onClick={() => onDelete(record.id)}
         className="p-2 text-red-500 hover:bg-red-50 rounded transition-colors"
         aria-label="Permanently delete book"
@@ -178,7 +179,7 @@ const AdminDeletedBooks = () => {
         </div>
 
         <ConfigProvider
-          theme={{ components: { Table: { headerBg: "#E7E7E7" } } }}
+          theme={{ components: { Table: { headerBg: "#E7E7E7 dark:#2A2A2A" } } }}
         >
           <Table
             columns={columns(setBookToDelete)}

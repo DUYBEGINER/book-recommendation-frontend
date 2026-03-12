@@ -1,6 +1,6 @@
 "use client"
 import { ConfigProvider, Table } from "antd"
-import { Pencil, Trash2 } from "lucide-react"
+import { Pencil, EyeOff } from "lucide-react"
 
 const columns = [
   {
@@ -35,6 +35,7 @@ const columns = [
     render: (_, record) => (
       <div className="flex items-center gap-2">
         <button
+          title = "Chỉnh sửa sách"
           onClick={() => record.onEdit(record.id)}
           className="p-2 text-orange-500 hover:bg-orange-50 rounded transition-colors"
           aria-label="Edit book"
@@ -42,11 +43,13 @@ const columns = [
           <Pencil className="w-5 h-5" />
         </button>
         <button
+          title = "Ẩn sách"
           onClick={() => record.onDelete(record.id)}
           className="p-2 text-red-500 hover:bg-red-50 rounded transition-colors"
-          aria-label="Delete book"
+          aria-label="Hide book"
+        
         >
-          <Trash2 className="w-5 h-5" />
+          <EyeOff className="w-5 h-5" />
         </button>
       </div>
     ),
@@ -73,7 +76,7 @@ const BookTable = ({
   const dataSource = books.map((book) => ({
     ...book,
     key: book.id,
-    author: book.authors?.map(a => a.name).join(", ") || "-",   // dùng đúng field "authors"
+    author: book.authors?.map(a => a.name).join(", ") || "-",  
     genres: book.genres?.map(g => g.name).join(", ") || "-",
     onEdit,
     onDelete,
@@ -84,7 +87,7 @@ const BookTable = ({
       theme={{
         components: {
           Table: {
-            headerBg: "#E7E7E7",
+            headerBg: "#E7E7E7 dark:#2A2A2A",
           },
         },
       }}

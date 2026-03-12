@@ -202,9 +202,9 @@ const AdminAddbook = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-white max-w-7xl mx-auto">
+      <div className="min-h-screen bg-white dark:bg-gray-900 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="grid grid-cols-3 items-center border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
+        <div className="grid grid-cols-3 items-center border-b border-gray-200 dark:border-gray-800 dark:text-blue-400 px-4 sm:px-6 lg:px-8 py-4">
           <button
             onClick={handleBack}
             className="justify-self-start inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
@@ -230,7 +230,7 @@ const AdminAddbook = () => {
           >
             {/* Left Column - Book Information */}
             <div className="lg:col-span-2 p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-blue-400 mb-6">
                 Thông tin sách
               </h2>
 
@@ -239,7 +239,7 @@ const AdminAddbook = () => {
                 <Form.Item
                   name="title"
                   label={
-                    <span className="text-gray-700 font-medium">Tên sách</span>
+                    <span className="text-gray-700 dark:text-gray-300 font-medium ">Tên sách</span>
                   }
                   rules={[
                     { required: true, message: "Vui lòng nhập tên sách" },
@@ -257,7 +257,7 @@ const AdminAddbook = () => {
                 <Form.Item
                   name="author"
                   label={
-                    <span className="text-gray-700 font-medium">Tác giả</span>
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">Tác giả</span>
                   }
                   rules={[{ required: true, message: "Vui lòng nhập tác giả" }]}
                   className="mb-4"
@@ -273,7 +273,7 @@ const AdminAddbook = () => {
                 <Form.Item
                   name="publisher"
                   label={
-                    <span className="text-gray-700 font-medium">
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">
                       Nhà xuất bản
                     </span>
                   }
@@ -284,7 +284,7 @@ const AdminAddbook = () => {
                 >
                   <Input
                     placeholder="NXB Dân Trí"
-                    className="rounded-lg"
+                    className="rounded-lg "
                     size="large"
                   />
                 </Form.Item>
@@ -293,7 +293,7 @@ const AdminAddbook = () => {
                 <Form.Item
                   name="publicationYear"
                   label={
-                    <span className="text-gray-700 font-medium">
+                    <span className="text-gray-700 dark:text-gray-300 font-medium">
                       Năm xuất bản
                     </span>
                   }
@@ -315,7 +315,7 @@ const AdminAddbook = () => {
               <Form.Item
                 name="genres"
                 label={
-                  <span className="text-gray-700 font-medium">Thể loại</span>
+                  <span className="text-gray-700 dark:text-gray-300 font-medium">Thể loại</span>
                 }
                 rules={[{ required: true, message: "Vui lòng chọn thể loại" }]}
                 className="mb-4"
@@ -329,12 +329,12 @@ const AdminAddbook = () => {
                   tagRender={(props) => {
                     const { label, closable, onClose } = props;
                     return (
-                      <span className="inline-flex items-center gap-1 bg-gray-100 text-gray-700 px-3 py-1 rounded-md mr-2 mb-1">
+                      <span className="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1 rounded-md mr-2 ">
                         {label}
                         {closable && (
                           <CloseCircleOutlined
                             onClick={onClose}
-                            className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                            className="text-gray-500  hover:text-gray-700 cursor-pointer"
                           />
                         )}
                       </span>
@@ -352,7 +352,7 @@ const AdminAddbook = () => {
               {/* Description */}
               <Form.Item
                 name="description"
-                label={<span className="text-gray-700 font-medium">Mô tả</span>}
+                label={<span className="text-gray-700 dark:text-gray-300 font-medium">Mô tả</span>}
                 rules={[{ required: true, message: "Vui lòng nhập mô tả" }]}
                 className="mb-4"
               >
@@ -365,8 +365,8 @@ const AdminAddbook = () => {
 
               {/* Book File Upload */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div className="space-y-4">
-                  <label className="block text-gray-700 font-medium">
+                <div className="space-y-4 flex flex-col flex-1 gap-2">
+                  <label className="block text-gray-700 dark:text-gray-300 font-medium">
                     Tải sách (PDF)
                   </label>
                   <ConfigProvider
@@ -384,10 +384,10 @@ const AdminAddbook = () => {
                       showUploadList={false}
                     >
                       <div className="py-8">
-                        <p className="text-gray-600 mb-2">
+                        <p className="text-gray-600 dark:text-gray-300 mb-2">
                           Kéo thả file hoặc chọn
                         </p>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-gray-400 dark:text-gray-300 text-sm">
                           Format: pdf &amp; Max file size: 25 MB
                         </p>
                       </div>
@@ -395,12 +395,12 @@ const AdminAddbook = () => {
                   </ConfigProvider>
 
                   {pdfFile && (
-                    <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg">
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between bg-blue-100 dark:bg-gray-600 p-3 rounded-lg">
+                      <div className="flex items-center gap-2 min-w-0">
                         <span className="text-blue-600 text-2xl">
                           <File />
                         </span>
-                        <span className="text-gray-700">{pdfFile.name}</span>
+                        <span className="text-gray-700 dark:text-gray-300 truncate">{pdfFile.name}</span>
                       </div>
                       <Button
                         type="text"
@@ -412,8 +412,8 @@ const AdminAddbook = () => {
                   )}
                 </div>
 
-                <div className="space-y-4">
-                  <label className="block text-gray-700 font-medium">
+                <div className="space-y-4 flex flex-col flex-1 gap-2">
+                  <label className="block text-gray-700 dark:text-gray-300 font-medium">
                     Tải sách (EPUB)
                   </label>
                   <ConfigProvider
@@ -431,10 +431,10 @@ const AdminAddbook = () => {
                       showUploadList={false}
                     >
                       <div className="py-8">
-                        <p className="text-gray-600 mb-2">
+                        <p className="text-gray-600 dark:text-gray-300 mb-2">
                           Kéo thả file hoặc chọn
                         </p>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-gray-400 dark:text-gray-300 text-sm">
                           Format: epub &amp; Max file size: 25 MB
                         </p>
                       </div>
@@ -442,12 +442,12 @@ const AdminAddbook = () => {
                   </ConfigProvider>
 
                   {epubFile && (
-                    <div className="flex items-center justify-between bg-blue-50 p-3 rounded-lg">
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center justify-between bg-blue-100 dark:bg-gray-600 p-3 rounded-lg">
+                      <div className="flex items-center gap-2 min-w-0">
                         <span className="text-blue-600 text-2xl">
                           <File />
                         </span>
-                        <span className="text-gray-700">{epubFile.name}</span>
+                        <span className="text-gray-700 dark:text-gray-300 truncate">{epubFile.name}</span>
                       </div>
                       <Button
                         type="text"
@@ -459,6 +459,7 @@ const AdminAddbook = () => {
                   )}
                 </div>
               </div>
+
               <div className="lg:col-span-3 flex justify-end">
                 <Button
                   type="primary"
@@ -474,8 +475,8 @@ const AdminAddbook = () => {
 
             {/* Right Column - Cover Image */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg p-6 sticky top-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 sticky top-6">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-300 mb-4">
                   Ảnh bìa
                 </h2>
                 <Upload.Dragger
@@ -508,7 +509,7 @@ const AdminAddbook = () => {
                       <div className="text-gray-300 text-6xl mb-4">
                         <Camera className=" mx-auto" size={48} />
                       </div>
-                      <p className="text-gray-600">Tải ảnh lên</p>
+                      <p className="text-gray-600 dark:text-gray-300">Tải ảnh lên</p>
                     </div>
                   )}
                 </Upload.Dragger>

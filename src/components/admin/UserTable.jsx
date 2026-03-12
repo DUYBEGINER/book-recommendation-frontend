@@ -39,6 +39,7 @@ const UserTable = ({
   selectedRowKeys = [],
   onSelectionChange,
 }) => {
+  
   const columns = [
     { title: 'Username', dataIndex: 'username', render: (_, record) => record.username || record.name || '-' },
     { title: 'User id', dataIndex: 'id' },
@@ -82,7 +83,7 @@ const UserTable = ({
       theme={{
         components: {
           Table: {
-            headerBg: '#E7E7E7',
+            headerBg: '#E7E7E7 dark:#2A2A2A',
           },
         },
       }}
