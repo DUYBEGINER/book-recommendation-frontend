@@ -21,7 +21,7 @@ const AccountInfoSection = React.memo(() => {
   const [updatingProfile, setUpdatingProfile] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
-  const { user, loading } = useAuth();
+  const { user, loading, fetchUserProfile: fetchGlobalUserProfile } = useAuth();
   const message = useMessage();
   const [userInfo, setUserInfo] = useState({});
 
@@ -49,6 +49,7 @@ const AccountInfoSection = React.memo(() => {
         await updateUserProfile(userId, formData);
         message.success("Cập nhật thông tin thành công");
         await fetchUserProfile();
+        await fetchGlobalUserProfile(); 
       } catch (error) {
         const msg = error?.response?.data?.message || "Cập nhật thông tin thất bại";
         message.error(msg);
@@ -67,6 +68,7 @@ const AccountInfoSection = React.memo(() => {
         await updateUserAvatar(userId, file);
         message.success("Cập nhật ảnh đại diện thành công");
         await fetchUserProfile();
+        await fetchGlobalUserProfile();
       } catch (error) {
         const msg = error?.response?.data?.message || "Cập nhật ảnh đại diện thất bại";
         message.error(msg);
