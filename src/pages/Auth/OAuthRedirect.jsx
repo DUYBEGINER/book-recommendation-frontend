@@ -35,8 +35,8 @@ const ERROR_MESSAGES = {
  * - Refresh token failure: Clear auth and redirect to login
  */
 const OAuthRedirect = () => {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { getUserProfile } = useAuth();
   const [status, setStatus] = useState('loading');
   const [errorMessage, setErrorMessage] = useState(null);

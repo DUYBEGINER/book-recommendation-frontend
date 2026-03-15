@@ -32,12 +32,6 @@ function AuthProvider({ children }) {
    * @returns {Promise<Object|null>} User data or null
    */
   const getUserProfile = useCallback(async () => {
-    const token = getAccessToken();
-    if (!token) {
-      setLoading(false);
-      return null;
-    }
-    
     setLoading(true);
     try {
       const userData = await getUser();
@@ -45,8 +39,9 @@ function AuthProvider({ children }) {
       return userData;
     } catch (err) {
       console.error("Failed to fetch user profile:", err);
-      // Token might be invalid - clear auth data
-      clearAuthData();
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+        clearAuthData();
+      }
       setUser(null);
       return null;
     } finally {
@@ -56,15 +51,19 @@ function AuthProvider({ children }) {
 
   /**
    * Initialize auth state on mount
-   * Fetches user profile if access token exists
    */
   useEffect(() => {
-    const token = getAccessToken();
-    if (token) {
-      getUserProfile();
-    } else {
-      setLoading(false);
-    }
+    const initAuth = async () => {
+      let token = getAccessToken();
+
+      if (token) {
+        await getUserProfile();
+      } else {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
   }, [getUserProfile]);
 
   /**
@@ -75,6 +74,7 @@ function AuthProvider({ children }) {
    * @returns {Promise<Object>} User data with role
    * @throws {Error} If login fails
    */
+
   const login = useCallback(async (email, password) => {
     setLoading(true);
     try {

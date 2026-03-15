@@ -3,8 +3,8 @@
  * Centralized API base URL and axios instance
  */
 import axios from "axios";
-import { getAccessToken, setAuthData, clearAuthData } from "../utils/storage";
 
+import { getAccessToken, setAuthData, clearAuthData } from "../utils/storage";
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 // Track refresh state to prevent multiple refresh calls
@@ -88,7 +88,6 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
         clearAuthData();
-        window.location.href = '/';
         return Promise.reject(err);
       } finally {
         isRefreshing = false;
