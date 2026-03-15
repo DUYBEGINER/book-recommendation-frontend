@@ -106,11 +106,7 @@ function AuthProvider({ children }) {
       await registerService(userData);
       return { success: true };
     } catch (error) {
-      console.error("Registration failed:", error);
-      return { 
-        success: false, 
-        message: error?.response?.data?.message || "Đăng ký thất bại" 
-      };
+      throw new Error(error?.response?.data?.message || "Đăng ký thất bại");
     } finally {
       setLoading(false);
     }

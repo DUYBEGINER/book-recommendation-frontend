@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
-import useAuth from '../../hooks/useAuth.jsx';
-import { validateSignup } from '../../utils/validatorInput.js';
-import useMessage  from '../../hooks/useMessage.jsx'; 
+import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import useAuth from "../../hooks/useAuth.jsx";
+import { validateSignup } from "../../utils/validatorInput.js";
+import useMessage from "../../hooks/useMessage.jsx";
 
 const INITIAL_FORM_STATE = {
-  email: '',
-  username: '',
-  phone_number: '',
-  password: '',
-  confirmPassword: ''
+  email: "",
+  username: "",
+  fullName: "",
+  phoneNumber: "",
+  password: "",
+  confirmPassword: "",
 };
 
 const Register = ({ onModeChange }) => {
@@ -18,53 +19,59 @@ const Register = ({ onModeChange }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [errorInputs, setErrorInputs] = useState({});
-  
+
   const message = useMessage();
   // Access register function from useAuth hook
   const { register } = useAuth();
 
-  const passwordMismatch = formData.password && 
-                          formData.confirmPassword && 
-                          formData.password !== formData.confirmPassword;
+  const passwordMismatch =
+    formData.password &&
+    formData.confirmPassword &&
+    formData.password !== formData.confirmPassword;
 
   const formFields = [
-    { 
-      id: 'email', 
-      type: 'email', 
-      placeholder: 'Email', 
-      autoComplete: 'email' 
-    },
-    { 
-      id: 'username', 
-      type: 'text', 
-      placeholder: 'Tên đăng nhập' 
-    },
-    { 
-      id: 'phone_number', 
-      type: 'text', 
-      placeholder: 'Số điện thoại' 
+    {
+      id: "email",
+      type: "email",
+      placeholder: "Email",
+      autoComplete: "email",
     },
     {
-      id: 'password',
-      type: showPassword ? 'text' : 'password',
-      placeholder: 'Mật khẩu',
+      id: "username",
+      type: "text",
+      placeholder: "Username",
+    },
+    {
+      id: "fullName",
+      type: "text",
+      placeholder: "Họ và tên",
+    },
+    {
+      id: "phoneNumber",
+      type: "text",
+      placeholder: "Số điện thoại",
+    },
+    {
+      id: "password",
+      type: showPassword ? "text" : "password",
+      placeholder: "Mật khẩu",
       showToggle: true,
       isVisible: showPassword,
-      onToggle: () => setShowPassword(!showPassword)
+      onToggle: () => setShowPassword(!showPassword),
     },
     {
-      id: 'confirmPassword',
-      type: showConfirmPassword ? 'text' : 'password',
-      placeholder: 'Xác nhận mật khẩu',
+      id: "confirmPassword",
+      type: showConfirmPassword ? "text" : "password",
+      placeholder: "Xác nhận mật khẩu",
       showToggle: true,
       isVisible: showConfirmPassword,
-      onToggle: () => setShowConfirmPassword(!showConfirmPassword)
-    }
+      onToggle: () => setShowConfirmPassword(!showConfirmPassword),
+    },
   ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Handle form submission
@@ -73,19 +80,17 @@ const Register = ({ onModeChange }) => {
     setErrorInputs({});
 
     const validationResult = validateSignup(formData);
-    
+
     if (!validationResult.valid) {
       setErrorInputs(validationResult.errors);
       return;
     }
-
+    console.log("Form data to submit:", formData);
     try {
       const result = await register(formData);
       if (result.success) {
-        message.success('Đăng ký thành công! Vui lòng đăng nhập.');
-        onModeChange('login');
-      } else {
-        message.error(result.error);
+        message.success("Đăng ký thành công! Vui lòng đăng nhập.");
+        onModeChange("login");
       }
     } catch (err) {
       message.error(err.message);
@@ -93,8 +98,8 @@ const Register = ({ onModeChange }) => {
   };
 
   const getFieldError = (fieldId) => {
-    if (fieldId === 'confirmPassword' && passwordMismatch) {
-      return 'Mật khẩu không khớp.';
+    if (fieldId === "confirmPassword" && passwordMismatch) {
+      return "Mật khẩu không khớp.";
     }
     return errorInputs[fieldId];
   };
@@ -102,7 +107,7 @@ const Register = ({ onModeChange }) => {
   return (
     <div className="w-full max-w-md">
       <h2 className="text-2xl font-bold text-center mb-6">Đăng ký</h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         {formFields.map((field) => (
           <div key={field.id}>
@@ -117,19 +122,21 @@ const Register = ({ onModeChange }) => {
                 placeholder={field.placeholder}
                 required
               />
-              
+
               {field.showToggle && (
                 <button
                   type="button"
                   onClick={field.onToggle}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                  aria-label={field.isVisible ? 'Hide password' : 'Show password'}
+                  aria-label={
+                    field.isVisible ? "Hide password" : "Show password"
+                  }
                 >
                   {field.isVisible ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               )}
             </div>
-            
+
             {getFieldError(field.id) && (
               <p className="mt-1 text-xs text-red-500">
                 {getFieldError(field.id)}
@@ -137,7 +144,7 @@ const Register = ({ onModeChange }) => {
             )}
           </div>
         ))}
-        
+
         <div className="flex items-center">
           <input
             type="checkbox"
@@ -151,7 +158,7 @@ const Register = ({ onModeChange }) => {
             Đồng ý với điều khoản & chính sách
           </label>
         </div>
-        
+
         <button
           type="submit"
           className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition"
@@ -159,11 +166,11 @@ const Register = ({ onModeChange }) => {
           Đăng ký
         </button>
       </form>
-      
+
       <p className="mt-6 text-center text-gray-600">
-        Bạn đã có tài khoản /{' '}
+        Bạn đã có tài khoản /{" "}
         <button
-          onClick={() => onModeChange('login')}
+          onClick={() => onModeChange("login")}
           className="text-red-500 font-semibold hover:underline"
         >
           Đăng nhập
