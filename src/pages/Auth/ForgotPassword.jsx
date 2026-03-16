@@ -17,10 +17,14 @@ const ForgotPassword = ({ onModeChange }) => {
       await forgotPassword(email);
       setSubmitted(true);
       message.success('Vui lòng kiểm tra email của bạn');
-    } catch {
-      // Show same success message to prevent email enumeration on the UI side
-      setSubmitted(true);
-      message.success('Vui lòng kiểm tra email của bạn');
+    } catch (error) {
+      if(error.response && error.response.status === 429) {
+        message.error('Quá nhiều yêu cầu. Vui lòng thử lại sau 15 phút.');
+      } else{ 
+        // Show same success message to prevent email enumeration on the UI side
+        setSubmitted(true);
+        message.success('Vui lòng kiểm tra email của bạn');
+      }
     } finally {
       setLoading(false);
     }
