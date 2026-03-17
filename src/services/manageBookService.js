@@ -119,6 +119,15 @@ export const hardDeleteBook = async (bookId) => {
   }
 };
 
+export const restoreBook = async (bookId) => {
+  try {
+    return await api.patch(`/admin/books/restore/${bookId}`);
+  } catch (error) {
+    console.error("Restore book failed:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
 export const deleteBooksBulk = async (bookIds = []) => {
   try {
     return await api.delete("/admin/books", {

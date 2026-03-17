@@ -3,9 +3,9 @@ import { useState, useEffect, useRef } from "react"
 import AdminLayout from "../../layouts/AdminLayout"
 import SearchBar from "../../components/admin/SearchBar"
 import SortSelect from "../../components/admin/SortSelect"
-import { Button, ConfigProvider, Modal, Table, message } from "antd"
-import { Trash2 } from "lucide-react"
-import { getDeletedBooks, hardDeleteBook } from "../../services/manageBookService"
+import { ConfigProvider, Modal, Table, message } from "antd"
+import { Trash2, Eye } from "lucide-react"
+import { getDeletedBooks, hardDeleteBook, restoreBook } from "../../services/manageBookService"
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Xóa gần nhất" },
@@ -14,7 +14,7 @@ const SORT_OPTIONS = [
   { value: "title-desc", label: "Tên Z-A" },
 ]
 
-const columns = (onDelete) => [
+const columns = (onDelete, onRestore) => [
   {
     title: "Tiêu đề",
     dataIndex: "title",
@@ -52,14 +52,24 @@ const columns = (onDelete) => [
     title: "Hành động",
     key: "action",
     render: (_, record) => (
-      <button
-        title = "Xóa vĩnh viễn sách"
-        onClick={() => onDelete(record.id)}
-        className="p-2 text-red-500 hover:bg-red-50 rounded transition-colors"
-        aria-label="Permanently delete book"
-      >
-        <Trash2 className="w-5 h-5" />
-      </button>
+      <div className="flex items-center gap-1">
+        <button
+          title="Bỏ ẩn sách"
+          onClick={() => onRestore(record.id)}
+          className="p-2 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded transition-colors"
+          aria-label="Restore book"
+        >
+          <Eye className="w-5 h-5" />
+        </button>
+        <button
+          title="Xóa vĩnh viễn sách"
+          onClick={() => onDelete(record.id)}
+          className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+          aria-label="Permanently delete book"
+        >
+          <Trash2 className="w-5 h-5" />
+        </button>
+      </div>
     ),
   },
 ]
@@ -71,6 +81,7 @@ const AdminDeletedBooks = () => {
   const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 })
   const [loading, setLoading] = useState(false)
   const [bookToDelete, setBookToDelete] = useState(null)
+  const [bookToRestore, setBookToRestore] = useState(null)
   const searchInitialized = useRef(false)
   const sortInitialized = useRef(false)
 
@@ -147,6 +158,24 @@ const AdminDeletedBooks = () => {
     }
   }
 
+  const confirmRestore = async () => {
+    if (!bookToRestore) return
+    try {
+      await restoreBook(bookToRestore)
+      message.success("Đã bỏ ẩn sách thành công!")
+
+      const totalAfterRestore = Math.max(0, pagination.total - 1)
+      const maxPageIndex = Math.max(0, Math.ceil(totalAfterRestore / pagination.pageSize) - 1)
+      const nextPage = Math.min(pagination.current - 1, maxPageIndex)
+
+      await fetchBooks(nextPage, pagination.pageSize, searchQuery, sortBy)
+      setBookToRestore(null)
+    } catch (error) {
+      message.error("Bỏ ẩn sách thất bại!")
+      console.error("Error restoring book:", error)
+    }
+  }
+
   const paginationConfig = {
     ...pagination,
     position: ["bottomCenter"],
@@ -182,7 +211,7 @@ const AdminDeletedBooks = () => {
           theme={{ components: { Table: { headerBg: "#E7E7E7 dark:#2A2A2A" } } }}
         >
           <Table
-            columns={columns(setBookToDelete)}
+            columns={columns(setBookToDelete, setBookToRestore)}
             dataSource={dataSource}
             pagination={paginationConfig}
             onChange={handleTableChange}
@@ -205,6 +234,21 @@ const AdminDeletedBooks = () => {
         <p>
           Bạn có chắc muốn <strong>xóa vĩnh viễn</strong> cuốn sách này?
           Hành động này không thể hoàn tác và sẽ xóa toàn bộ dữ liệu liên quan.
+        </p>
+      </Modal>
+
+      <Modal
+        title="Bỏ ẩn sách"
+        open={!!bookToRestore}
+        onOk={confirmRestore}
+        onCancel={() => setBookToRestore(null)}
+        okText="Bỏ ẩn"
+        cancelText="Hủy"
+        centered
+      >
+        <p>
+          Bạn có chắc muốn <strong>bỏ ẩn</strong> cuốn sách này?
+          Sách sẽ hiển thị lại cho người dùng trên hệ thống.
         </p>
       </Modal>
     </AdminLayout>
