@@ -12,6 +12,8 @@ import useSameGenreBooks from '../hooks/useSameGenreBooks';
 const BookCover = React.lazy(() => import('../components/book-detail/BookCover'));
 const BookInfo = React.lazy(() => import('../components/book-detail/BookInfo'));
 const RelatedBooks = React.lazy(() => import('../components/book-detail/RelatedBooks'));
+const BookDescription = React.lazy(() => import('../components/book-detail/BookDescription'));
+const ReviewsSection = React.lazy(() => import('../components/book-detail/ReviewsSection'));
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -95,71 +97,93 @@ const BookDetail = () => {
     <MainLayout showHero={false} onSearchSubmit={handleSearchSubmit}>
       <ScrollToTop />
 
-      {/* Breadcrumb */}
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="bg-white dark:bg-gray-800 p-4 shadow-sm">
-          <Breadcrumb separator=">" items={breadcrumbItems} />
-        </div>
-      </div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-12 transition-colors duration-300">
+          
+          {/* Top Section - White background */}
+          <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-100 dark:border-gray-700 transition-colors duration-300">
+             <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+               <Breadcrumb separator=">" items={breadcrumbItems} className="mb-12" />
+               
+               {/* Loading State */}
+                {loading && (
+                  <div className="text-center py-12">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+                    <p className="mt-4 text-gray-600 dark:text-gray-300">Đang tải thông tin sách...</p>
+                  </div>
+                )}
 
-      {/* Book Detail Content */}
-      <div className="min-h-screen dark:bg-gray-900">
-        <div className="px-4 sm:px-6 lg:px-8 py-4">
-          <div className="bg-white dark:bg-gray-800 shadow-sm p-8 space-y-16">
-            {/* Loading State */}
-            {loading && (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
-                <p className="mt-4 text-gray-600 dark:text-gray-300">Đang tải thông tin sách...</p>
-              </div>
-            )}
+                {/* Error State - No book found */}
+                {!loading && !book && (
+                  <div className="text-center py-12">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Không tìm thấy sách</h2>
+                    <p className="text-gray-600 dark:text-gray-400">Sách bạn tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+                  </div>
+                )}
 
-            {/* Error State - No book found */}
-            {!loading && !book && (
-              <div className="text-center py-12">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Không tìm thấy sách</h2>
-                <p className="text-gray-600 dark:text-gray-400">Sách bạn tìm kiếm không tồn tại hoặc đã bị xóa.</p>
-              </div>
-            )}
-
-            {/* Main Book Detail */}
-            {!loading && enrichedBook && (
-              <ErrorBoundary>
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                  <Suspense fallback={<div className="text-center py-4">Loading...</div>}>
-                    <BookCover src={enrichedBook.cover} alt={enrichedBook.title} />
-                    <BookInfo
-                      book={enrichedBook}
-                      onRead={handleRead}
-                      onFavorite={handleFavorite}
-                      isFavorited={isFavorited}
-                      loadingFavorite={loadingFavorite}
-                      onDownload={handleDownload}
-                      onReviewSubmit={handleReviewSubmit}
-                      onLoadMore={loadMore}
-                      hasMore={hasMore}
-                      loadingMore={loadingMore}
-                    />
-                  </Suspense>
-                </div>
-              </ErrorBoundary>
-            )}
-
-            {/* Same-genre books — starts loading once the main book is resolved */}
-            {!loading && book && (
-              <ErrorBoundary>
-                <Suspense fallback={<div className="text-center py-4">Loading related books...</div>}>
-                  <RelatedBooks
-                    books={sameGenreBooks}
-                    loading={loadingSameGenre}
-                    genreId={firstGenre?.genreId}
-                    genreName={firstGenre?.genreName}
-                  />
-                </Suspense>
-              </ErrorBoundary>
-            )}
+               {/* Main Book Detail - Hero Section */}
+               {!loading && enrichedBook && (
+                  <ErrorBoundary>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 pb-8">
+                      <div className="lg:col-span-4 xl:col-span-3 flex justify-center lg:justify-start">
+                         <Suspense fallback={<div className="h-96 w-64 bg-gray-200 animate-pulse rounded-lg"></div>}>
+                            <BookCover src={enrichedBook.cover} alt={enrichedBook.title} className="shadow-2xl hover:shadow-3xl transition-shadow duration-300" />
+                         </Suspense>
+                      </div>
+                      <div className="lg:col-span-8 xl:col-span-9">
+                        <Suspense fallback={<div className="h-40 bg-gray-100 animate-pulse rounded"></div>}>
+                            <BookInfo
+                              book={enrichedBook}
+                              onRead={handleRead}
+                              onFavorite={handleFavorite}
+                              isFavorited={isFavorited}
+                              loadingFavorite={loadingFavorite}
+                              onDownload={handleDownload}
+                            />
+                        </Suspense>
+                      </div>
+                    </div>
+                  </ErrorBoundary>
+                )}
+             </div>
           </div>
-        </div>
+
+          {/* Content Section - Light background */}
+          {!loading && enrichedBook && (
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+               {/* Main Content - Full Width to fix asymmetry */}
+               <div className="space-y-8">
+                  <ErrorBoundary>
+                    <Suspense fallback={<div className="h-64 bg-gray-200 animate-pulse rounded-2xl"></div>}>
+                       <BookDescription description={enrichedBook.description} />
+                    </Suspense>
+                    <Suspense fallback={<div className="h-64 bg-gray-200 animate-pulse rounded-2xl"></div>}>
+                       <ReviewsSection
+                          rating={enrichedBook.rating}
+                          totalReviews={enrichedBook.totalReviews}
+                          reviews={enrichedBook.reviewsList || []}
+                          bookTitle={enrichedBook.title}
+                          onLoadMore={loadMore}
+                          hasMore={hasMore}
+                          loadingMore={loadingMore}
+                          onReviewSubmit={handleReviewSubmit}
+                        />
+                    </Suspense>
+                  </ErrorBoundary>
+               </div>
+
+               {/* Related Books Section */}
+               <ErrorBoundary>
+                 <Suspense fallback={<div className="text-center py-4">Loading related books...</div>}>
+                   <RelatedBooks
+                     books={sameGenreBooks}
+                     loading={loadingSameGenre}
+                     genreId={firstGenre?.genreId}
+                     genreName={firstGenre?.genreName}
+                   />
+                 </Suspense>
+               </ErrorBoundary>
+            </div>
+          )}
       </div>
     </MainLayout>
   );
