@@ -9,7 +9,7 @@ export const patterns = {
   passwordStrong: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/,
 
   // Username: 3-20 ký tự, chữ/số/_ , có thể có khoảng trắng
-  username: /^(?=.{3,20}$)[\p{L}\p{N}_\s]+$/u,
+  username: /^[a-zA-Z0-9_]{3,20}$/,
 
   // Họ tên (có dấu, cho phép khoảng trắng, dấu . ' - ), độ dài 2-50
   fullName: /^[\p{L}][\p{L}\s'.-]{0,48}[\p{L}]$/u,
@@ -19,16 +19,30 @@ export const patterns = {
 };
 
 export function validateLogin(form) {
-  // form: { email, password }
   const errors = {};
-  const email = (form.email || "").trim();
+  
+  const identifier = (form.identifier || "").trim(); 
   const password = form.password || "";
-  if(!email || !patterns.email.test(email)) {
-    errors.email = "Email không hợp lệ.";
+
+  // 1. Check identifier (Email/Username)
+  if (!identifier) {
+    errors.identifier = "Vui lòng nhập Email hoặc Tên đăng nhập.";
+  } else {
+    // check if it's a valid email or username
+    const isEmail = patterns.email.test(identifier);
+    const isUsername = patterns.username.test(identifier);
+
+    // Nếu KHÔNG phải email VÀ cũng KHÔNG phải username -> Báo lỗi
+    if (!isEmail && !isUsername) {
+      errors.identifier = "Email hoặc Tên đăng nhập không hợp lệ.";
+    }
   }
-  if(!password) {
+
+  // 2. Check Password
+  if (!password) {
     errors.password = "Mật khẩu không được để trống.";
   }
+
   return {
     valid: Object.keys(errors).length === 0,
     errors

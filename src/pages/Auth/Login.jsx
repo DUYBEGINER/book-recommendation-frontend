@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import useAuth from '../../hooks/useAuth.jsx';
-import { PATHS } from '../../constants/routePaths.js';
-import ButtonLoginGoogle from '../../components/auth/ButtonLoginGoogle.jsx';
-import { validateLogin } from '../../utils/validatorInput.js'; 
-import useMessage  from '../../hooks/useMessage.jsx'; 
+import React, { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth.jsx";
+import { PATHS } from "../../constants/routePaths.js";
+import ButtonLoginGoogle from "../../components/auth/ButtonLoginGoogle.jsx";
+import { validateLogin } from "../../utils/validatorInput.js";
+import useMessage from "../../hooks/useMessage.jsx";
 
 const Login = ({ onModeChange, onClose }) => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    identifier: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const message = useMessage(); // use global message
@@ -25,42 +25,40 @@ const Login = ({ onModeChange, onClose }) => {
   const onChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
-  }
+  };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    
-    const { email, password } = formData;
-    // Validate email and password
-    const validation = validateLogin({ email, password });
+    setError("");
+
+    const { identifier, password } = formData;
+    // Validate identifier and password
+    const validation = validateLogin({ identifier, password });
     if (!validation.valid) {
-      message.warning('Vui lòng nhập đủ Email và Mật khẩu hợp lệ');
+      message.warning(validation.errors.identifier || validation.errors.password);
       setLoading(false);
       return;
     }
     setLoading(true);
     try {
-      const result = await login(email, password);
+      const result = await login(identifier, password);
       // Display success message
-      message.success('Đăng nhập thành công!');
+      message.success("Đăng nhập thành công!");
       const role = result?.role;
-      if (role && role.toUpperCase() === 'ADMIN') {
+      if (role && role.toUpperCase() === "ADMIN") {
         navigate(PATHS.ADMIN.ROOT, { replace: true });
       }
-      console.log('Login result:', result);
       onClose?.(); // Close modal on successful login
     } catch (err) {
-      message.error('Đăng nhập thất bại!');
+      message.error("Đăng nhập thất bại!");
       setError(err.message);
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="w-full max-w-m">
@@ -71,24 +69,23 @@ const Login = ({ onModeChange, onClose }) => {
         </div>
       )}
 
-
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <input
-            type="email"
-            value={formData.email}
-            name="email"
+            type="text"
+            value={formData.identifier}
+            name="identifier"
             onChange={onChange}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-            placeholder="Email"
+            placeholder="Email hoặc username"
             autocomplete="email"
             // required
           />
         </div>
-        
+
         <div className="relative">
           <input
-            type={showPassword ? 'text' : 'password'}
+            type={showPassword ? "text" : "password"}
             value={formData.password}
             name="password"
             onChange={onChange}
@@ -97,15 +94,14 @@ const Login = ({ onModeChange, onClose }) => {
             autocomplete="password"
             // required
           />
-          <button
-            type="button"
+          <span
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-          </button>
+          </span>
         </div>
-        
+
         <div className="flex justify-between items-center">
           <label className="flex items-center">
             <input type="checkbox" className="mr-2" />
@@ -113,41 +109,43 @@ const Login = ({ onModeChange, onClose }) => {
           </label>
           <button
             type="button"
-            onClick={() => onModeChange('forgot')}
+            onClick={() => onModeChange("forgot")}
             className="text-sm text-red-500 hover:underline"
           >
             Quên mật khẩu?
           </button>
         </div>
-        
+
         <button
           type="submit"
           disabled={loading}
           className="w-full bg-red-500 text-white py-3 rounded-lg font-semibold hover:bg-red-600 transition"
         >
-          {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+          {loading ? "Đang đăng nhập..." : "Đăng nhập"}
         </button>
       </form>
-      
+
       <div className="mt-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-300"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">hoặc đăng nhập qua</span>
+            <span className="px-2 bg-white text-gray-500">
+              hoặc đăng nhập qua
+            </span>
           </div>
         </div>
-        
+
         <div className="mt-6 flex justify-center space-x-4">
           <ButtonLoginGoogle />
         </div>
       </div>
-      
+
       <p className="mt-6 text-center text-gray-600">
-        Bạn chưa có tài khoản?{' '}
+        Bạn chưa có tài khoản?{" "}
         <button
-          onClick={() => onModeChange('register')}
+          onClick={() => onModeChange("register")}
           className="text-red-500 font-semibold hover:underline"
         >
           Đăng ký

@@ -10,9 +10,9 @@ export const getUser = async () => {
   }
 };
 
-export const login = async (email, password) => {
+export const login = async (identifier, password) => {
   try {
-    const response = await api.post("/auth/login", { email, password });
+    const response = await api.post("/auth/login", { identifier, password });
     return response.data || response;
   } catch (error) {
     console.error("Login failed:", error.response?.data || error.message);
