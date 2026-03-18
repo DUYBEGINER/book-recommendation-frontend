@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, PencilLine } from 'lucide-react';
+import { PencilLine } from 'lucide-react';
 import StarRating from './StarRating';
 
 const RatingSummary = React.memo(({ rating, totalReviews, onWriteReview, ratingDistribution = {} }) => {
@@ -14,42 +14,44 @@ const RatingSummary = React.memo(({ rating, totalReviews, onWriteReview, ratingD
   const distribution = { ...defaultDistribution, ...ratingDistribution };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 mb-8 p-4 bg-gray-100 dark:bg-gray-700/50 border border-gray-300 dark:border-gray-600 rounded-xl">
-      {/* Rating Summary */}
-      <div className="lg:col-span-1">
-        <div className="text-center">
-          <div className="text-6xl font-bold text-gray-900 dark:text-white mb-2">
-            {rating.toFixed(1)}
-          </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">{totalReviews} đánh giá</div>
+    <div className="flex flex-col sm:flex-row items-stretch gap-6 mb-8 p-5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/50 rounded-2xl shadow-sm">
+      {/* Left: Big score */}
+      <div className="flex flex-col items-center justify-center sm:min-w-[120px]">
+        <div className="text-5xl font-bold text-gray-900 dark:text-white leading-none">
+          {rating.toFixed(1)}
         </div>
+        <StarRating rating={rating} showValue={false} size="w-3.5 h-3.5" />
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">{totalReviews} đánh giá</p>
       </div>
 
-      {/* Rating Breakdown */}
-      <div className="lg:col-span-5">
-        <div className="space-y-2">
-          {[5, 4, 3, 2, 1].map((stars) => (
-            <div key={stars} className="flex items-center gap-4">
-              <div className="flex flex-1 text-yellow-400 text-xs justify-end">
-                <StarRating rating={stars} showValue={false} size="w-3 h-3" />
-              </div>
-              <div className="flex-5 bg-gray-200 dark:bg-gray-600 rounded-full h-2">
-                <div
-                  className="bg-yellow-400 h-2 rounded-full"
-                  style={{ width: `${distribution[stars]}%` }}
-                />
-              </div>
+      {/* Divider */}
+      <div className="hidden sm:block w-px bg-gray-100 dark:bg-gray-700" />
+
+      {/* Center: Distribution bars */}
+      <div className="flex-1 space-y-1.5">
+        {[5, 4, 3, 2, 1].map((stars) => (
+          <div key={stars} className="flex items-center gap-3">
+            <span className="text-xs text-gray-500 dark:text-gray-400 w-3 text-right">{stars}</span>
+            <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-amber-400 h-full rounded-full transition-all duration-500"
+                style={{ width: `${distribution[stars]}%` }}
+              />
             </div>
-          ))}
-        </div>
+            <span className="text-xs text-gray-400 dark:text-gray-500 w-8 text-right">{distribution[stars]}%</span>
+          </div>
+        ))}
       </div>
 
-      <button 
-        onClick={onWriteReview}
-        className="w-full flex items-center gap-1 lg:col-start-6 lg:col-span-3 py-2 px-3 bg-teal-500 dark:bg-teal-600 text-white rounded-full hover:bg-teal-600 dark:hover:bg-teal-700 transition-colors"
-    >
-        <PencilLine size={20} /> Viết đánh giá
-      </button>
+      {/* Right: Write review button */}
+      <div className="flex items-center sm:pl-2">
+        <button
+          onClick={onWriteReview}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 py-2.5 px-5 bg-primary text-white rounded-full hover:bg-primary-hover transition-all text-sm font-medium shadow-md shadow-primary/20 active:scale-95"
+        >
+          <PencilLine size={16} /> Viết đánh giá
+        </button>
+      </div>
     </div>
   );
 });

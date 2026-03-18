@@ -95,71 +95,77 @@ const BookDetail = () => {
     <MainLayout showHero={false} onSearchSubmit={handleSearchSubmit}>
       <ScrollToTop />
 
-      {/* Breadcrumb */}
-      <div className="px-4 sm:px-6 lg:px-8">
-        <div className="bg-white dark:bg-gray-800 p-4 shadow-sm">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        {/* Breadcrumb */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
           <Breadcrumb separator=">" items={breadcrumbItems} />
         </div>
-      </div>
 
-      {/* Book Detail Content */}
-      <div className="min-h-screen dark:bg-gray-900">
-        <div className="px-4 sm:px-6 lg:px-8 py-4">
-          <div className="bg-white dark:bg-gray-800 shadow-sm p-8 space-y-16">
-            {/* Loading State */}
-            {loading && (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
-                <p className="mt-4 text-gray-600 dark:text-gray-300">Đang tải thông tin sách...</p>
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-24">
+            <div className="h-12 w-12 rounded-full border-4 border-gray-200 border-t-primary animate-spin" />
+            <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">Đang tải thông tin sách...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {!loading && !book && (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Không tìm thấy sách</h2>
+            <p className="text-gray-500 dark:text-gray-400">Sách bạn tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+          </div>
+        )}
+
+        {/* Main Book Detail */}
+        {!loading && enrichedBook && (
+          <>
+            {/* Hero Section with blurred backdrop */}
+            <div className="relative overflow-hidden">
+              <div
+                className="absolute inset-0 scale-110 blur-2xl opacity-20 dark:opacity-10 bg-cover bg-center"
+                style={{ backgroundImage: `url(${enrichedBook.cover})` }}
+              />
+              <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+                <ErrorBoundary>
+                  <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+                    <Suspense fallback={<div className="lg:w-72 aspect-[3/4] bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse" />}>
+                      <BookCover src={enrichedBook.cover} alt={enrichedBook.title} />
+                    </Suspense>
+                    <Suspense fallback={<div className="flex-1 space-y-4"><div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse" /><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse" /></div>}>
+                      <BookInfo
+                        book={enrichedBook}
+                        onRead={handleRead}
+                        onFavorite={handleFavorite}
+                        isFavorited={isFavorited}
+                        loadingFavorite={loadingFavorite}
+                        onDownload={handleDownload}
+                        onReviewSubmit={handleReviewSubmit}
+                        onLoadMore={loadMore}
+                        hasMore={hasMore}
+                        loadingMore={loadingMore}
+                      />
+                    </Suspense>
+                  </div>
+                </ErrorBoundary>
               </div>
-            )}
+            </div>
 
-            {/* Error State - No book found */}
-            {!loading && !book && (
-              <div className="text-center py-12">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Không tìm thấy sách</h2>
-                <p className="text-gray-600 dark:text-gray-400">Sách bạn tìm kiếm không tồn tại hoặc đã bị xóa.</p>
-              </div>
-            )}
-
-            {/* Main Book Detail */}
-            {!loading && enrichedBook && (
-              <ErrorBoundary>
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                  <Suspense fallback={<div className="text-center py-4">Loading...</div>}>
-                    <BookCover src={enrichedBook.cover} alt={enrichedBook.title} />
-                    <BookInfo
-                      book={enrichedBook}
-                      onRead={handleRead}
-                      onFavorite={handleFavorite}
-                      isFavorited={isFavorited}
-                      loadingFavorite={loadingFavorite}
-                      onDownload={handleDownload}
-                      onReviewSubmit={handleReviewSubmit}
-                      onLoadMore={loadMore}
-                      hasMore={hasMore}
-                      loadingMore={loadingMore}
-                    />
-                  </Suspense>
-                </div>
-              </ErrorBoundary>
-            )}
-
-            {/* Same-genre books — starts loading once the main book is resolved */}
-            {!loading && book && (
-              <ErrorBoundary>
-                <Suspense fallback={<div className="text-center py-4">Loading related books...</div>}>
+            {/* Related Books */}
+            <ErrorBoundary>
+              <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-8"><div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse" /></div>}>
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                   <RelatedBooks
                     books={sameGenreBooks}
                     loading={loadingSameGenre}
                     genreId={firstGenre?.genreId}
                     genreName={firstGenre?.genreName}
                   />
-                </Suspense>
-              </ErrorBoundary>
-            )}
-          </div>
-        </div>
+                </div>
+              </Suspense>
+            </ErrorBoundary>
+          </>
+        )}
       </div>
     </MainLayout>
   );

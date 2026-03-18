@@ -3,9 +3,9 @@ import ReviewCard from './ReviewCard';
 
 const ReviewsList = React.memo(({ reviews, onLoadMore, hasMore = false, loadingMore = false }) => {
   return (
-    <div className="lg:col-span-2 space-y-6">
+    <div className="space-y-4">
       {reviews.length === 0 && !loadingMore && (
-        <p className="text-gray-500 dark:text-gray-400 text-center py-4">Chưa có đánh giá nào.</p>
+        <p className="text-gray-400 dark:text-gray-500 text-center py-8 text-sm">Chưa có đánh giá nào.</p>
       )}
 
       {reviews.map((review, index) => (
@@ -13,13 +13,13 @@ const ReviewsList = React.memo(({ reviews, onLoadMore, hasMore = false, loadingM
       ))}
 
       {hasMore && (
-        <div className="text-center pt-4">
+        <div className="text-center pt-2">
           <button
             onClick={onLoadMore}
             disabled={loadingMore}
-            className="bg-gray-200 dark:bg-gray-700 text-black dark:text-white rounded-2xl font-medium py-2 px-4 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+            className="text-sm font-medium text-primary hover:text-primary-hover dark:text-red-400 dark:hover:text-red-300 py-2 px-6 rounded-full border border-primary/30 dark:border-red-400/30 hover:bg-primary/5 dark:hover:bg-red-400/5 transition-all disabled:opacity-50"
           >
-            {loadingMore ? 'Đang tải...' : 'Xem thêm'}
+            {loadingMore ? 'Đang tải...' : 'Xem thêm đánh giá'}
           </button>
         </div>
       )}

@@ -29,12 +29,10 @@ const SkeletonCard = () => (
  *   genreName {string|null}   – Display name for the genre page navigation.
  */
 const RelatedBooks = React.memo(({ books, loading = false, genreId, genreName }) => {
-  // Render nothing when there is neither data nor an active load — this
-  // keeps the page clean when a book has no genre assignments.
   if (!loading && (!books || books.length === 0)) return null;
 
   return (
-    <div className="container mx-auto px-4 pb-12">
+    <div className="pb-4">
       <SectionHeader
         title="Sách cùng thể loại"
         subtitle={!!genreId}
@@ -42,7 +40,7 @@ const RelatedBooks = React.memo(({ books, loading = false, genreId, genreName })
         genreName={genreName}
       />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
         {loading
           ? Array.from({ length: SKELETON_COUNT }, (_, i) => <SkeletonCard key={i} />)
           : books.map((book) => <BookCard key={book.bookId} book={book} />)

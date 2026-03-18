@@ -8,13 +8,17 @@ import ReviewsSection from './ReviewsSection';
 
 const BookInfo = React.memo(({ book, onRead, onFavorite, onDownload, isFavorited, loadingFavorite, onReviewSubmit, onLoadMore, hasMore, loadingMore }) => {
   return (
-    <div className="lg:col-span-3">
-      <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{book.title}</h1>
+    <div className="flex-1 min-w-0">
+      {/* Title */}
+      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white tracking-tight leading-tight mb-3">
+        {book.title}
+      </h1>
 
       {/* Rating */}
       <div className="flex items-center gap-3 mb-6">
-        <StarRating rating={book.rating} showValue={false} />
-        <span className="text-sm text-gray-600 dark:text-gray-400">{book.totalReviews} Đánh giá</span>
+        <StarRating rating={book.rating} showValue />
+        <span className="text-xs text-gray-400 dark:text-gray-500">|</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">{book.totalReviews} Đánh giá</span>
       </div>
 
       {/* Metadata */}
