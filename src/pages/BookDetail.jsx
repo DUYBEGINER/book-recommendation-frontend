@@ -1,17 +1,20 @@
+import React, { useMemo, useCallback, useEffect, Suspense } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import MainLayout from "../layouts/MainLayout";
+import { Breadcrumb } from "antd";
+import ScrollToTop from "../components/common/ScrollToTop";
+import useBookDetail from "../hooks/useBookDetail";
+import useFavorite from "../hooks/useFavorite";
+import useBookReviews from "../hooks/useBookReviews";
+import useSameGenreBooks from "../hooks/useSameGenreBooks";
 
-import React, { useMemo, useCallback, useEffect, Suspense } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import MainLayout from '../layouts/MainLayout';
-import { Breadcrumb } from 'antd';
-import ScrollToTop from '../components/common/ScrollToTop';
-import useBookDetail from '../hooks/useBookDetail';
-import useFavorite from '../hooks/useFavorite';
-import useBookReviews from '../hooks/useBookReviews';
-import useSameGenreBooks from '../hooks/useSameGenreBooks';
-
-const BookCover = React.lazy(() => import('../components/book-detail/BookCover'));
-const BookInfo = React.lazy(() => import('../components/book-detail/BookInfo'));
-const RelatedBooks = React.lazy(() => import('../components/book-detail/RelatedBooks'));
+const BookCover = React.lazy(
+  () => import("../components/book-detail/BookCover"),
+);
+const BookInfo = React.lazy(() => import("../components/book-detail/BookInfo"));
+const RelatedBooks = React.lazy(
+  () => import("../components/book-detail/RelatedBooks"),
+);
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -25,14 +28,16 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('BookDetail Error:', error, errorInfo);
+    console.error("BookDetail Error:", error, errorInfo);
   }
 
   render() {
     if (this.state.hasError) {
       return (
         <div className="text-center py-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Có lỗi xảy ra</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Có lỗi xảy ra
+          </h2>
           <p className="text-gray-600">Vui lòng thử lại sau.</p>
         </div>
       );
@@ -44,23 +49,40 @@ class ErrorBoundary extends React.Component {
 
 const BookDetail = () => {
   const navigate = useNavigate();
-  console.log('Rendering BookDetail');
-  const { book, bookData, loading, handleRead, handleDownload } = useBookDetail();
-  const { isFavorited, loadingFavorite, handleFavorite, syncFavorite } = useFavorite(book?.id);
+  console.log("Rendering BookDetail");
+  const { book, bookData, loading, handleRead, handleDownload } =
+    useBookDetail();
+  const { isFavorited, loadingFavorite, handleFavorite, syncFavorite } =
+    useFavorite(book?.id);
 
   // Fetch books that share at least one genre with the current book.
   // Starts only once `book.id` is resolved; no-ops on null/undefined.
-  const { books: sameGenreBooks, loading: loadingSameGenre } = useSameGenreBooks(book?.id);
+  const { books: sameGenreBooks, loading: loadingSameGenre } =
+    useSameGenreBooks(book?.id);
 
   // Derive the first genre for the "Xem tất cả" navigation in RelatedBooks.
   const firstGenre = bookData?.genres?.[0];
 
-  const ratingStats = useMemo(() => bookData ? {
-    averageRating: bookData.averageRating ?? 0,
-    totalReviews: bookData.totalReviews ?? 0,
-  } : null, [bookData]);
+  const ratingStats = useMemo(
+    () =>
+      bookData
+        ? {
+            averageRating: bookData.averageRating ?? 0,
+            totalReviews: bookData.totalReviews ?? 0,
+          }
+        : null,
+    [bookData],
+  );
 
-  const { reviews, avgRating, totalReviews, hasMore, loadingMore, loadMore, handleReviewSubmit } = useBookReviews(book?.id, ratingStats);
+  const {
+    reviews,
+    avgRating,
+    totalReviews,
+    hasMore,
+    loadingMore,
+    loadMore,
+    handleReviewSubmit,
+  } = useBookReviews(book?.id, ratingStats);
 
   // Sync favorite state from the book detail response
   useEffect(() => {
@@ -68,17 +90,23 @@ const BookDetail = () => {
     syncFavorite(bookData.isFav ?? false);
   }, [bookData, syncFavorite]);
 
-  const breadcrumbItems = useMemo(() => [
-    { title: <Link to="/">Trang chủ</Link> },
-    { title: <p>Chi tiết sách</p> },
-  ], []);
+  const breadcrumbItems = useMemo(
+    () => [
+      { title: <Link to="/">Trang chủ</Link> },
+      { title: <p>Chi tiết sách</p> },
+    ],
+    [],
+  );
 
-  const handleSearchSubmit = useCallback((keyword) => {
-    const trimmedKeyword = keyword.trim();
-    if (trimmedKeyword) {
-      navigate(`/search?q=${encodeURIComponent(trimmedKeyword)}`);
-    }
-  }, [navigate]);
+  const handleSearchSubmit = useCallback(
+    (keyword) => {
+      const trimmedKeyword = keyword.trim();
+      if (trimmedKeyword) {
+        navigate(`/search?q=${encodeURIComponent(trimmedKeyword)}`);
+      }
+    },
+    [navigate],
+  );
 
   // Compose the enriched book object for BookInfo
   const enrichedBook = useMemo(() => {
@@ -105,15 +133,21 @@ const BookDetail = () => {
         {loading && (
           <div className="flex flex-col items-center justify-center py-24">
             <div className="h-12 w-12 rounded-full border-4 border-gray-200 border-t-primary animate-spin" />
-            <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">Đang tải thông tin sách...</p>
+            <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+              Đang tải thông tin sách...
+            </p>
           </div>
         )}
 
         {/* Error State */}
         {!loading && !book && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Không tìm thấy sách</h2>
-            <p className="text-gray-500 dark:text-gray-400">Sách bạn tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Không tìm thấy sách
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400">
+              Sách bạn tìm kiếm không tồn tại hoặc đã bị xóa.
+            </p>
           </div>
         )}
 
@@ -121,18 +155,34 @@ const BookDetail = () => {
         {!loading && enrichedBook && (
           <>
             {/* Hero Section with blurred backdrop */}
-            <div className="relative overflow-hidden">
-              <div
-                className="absolute inset-0 scale-110 blur-2xl opacity-20 dark:opacity-10 bg-cover bg-center"
-                style={{ backgroundImage: `url(${enrichedBook.cover})` }}
-              />
-              <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+            <div className="relative">
+              <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+                <div
+                  className="absolute inset-0 scale-110 blur-2xl opacity-20 dark:opacity-10 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${enrichedBook.cover})` }}
+                />
+              </div>
+              <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
                 <ErrorBoundary>
                   <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-                    <Suspense fallback={<div className="lg:w-72 aspect-[3/4] bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse" />}>
-                      <BookCover src={enrichedBook.cover} alt={enrichedBook.title} />
+                    <Suspense
+                      fallback={
+                        <div className="lg:w-72 aspect-[3/4] bg-gray-200 dark:bg-gray-700 rounded-2xl animate-pulse" />
+                      }
+                    >
+                      <BookCover
+                        src={enrichedBook.cover}
+                        alt={enrichedBook.title}
+                      />
                     </Suspense>
-                    <Suspense fallback={<div className="flex-1 space-y-4"><div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse" /><div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse" /></div>}>
+                    <Suspense
+                      fallback={
+                        <div className="flex-1 space-y-4">
+                          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse" />
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse" />
+                        </div>
+                      }
+                    >
                       <BookInfo
                         book={enrichedBook}
                         onRead={handleRead}
@@ -153,7 +203,13 @@ const BookDetail = () => {
 
             {/* Related Books */}
             <ErrorBoundary>
-              <Suspense fallback={<div className="max-w-7xl mx-auto px-4 py-8"><div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse" /></div>}>
+              <Suspense
+                fallback={
+                  <div className="max-w-7xl mx-auto px-4 py-8">
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 animate-pulse" />
+                  </div>
+                }
+              >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                   <RelatedBooks
                     books={sameGenreBooks}

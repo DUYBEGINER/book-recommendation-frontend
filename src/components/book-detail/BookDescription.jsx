@@ -10,17 +10,24 @@ const BookDescription = React.memo(({ description, previewLength = 800 }) => {
     ? description
     : description.substring(0, previewLength) + '...';
 
+  // Điều kiện để kích hoạt hiệu ứng fade mờ
+  const isFaded = shouldTruncate && !showFullDescription;
+
   return (
     <div className="mb-10">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Giới thiệu sách</h2>
-      <div className="relative">
-        <div className="text-sm text-gray-600 dark:text-gray-300 leading-7 text-justify whitespace-pre-line">
-          {displayText}
-        </div>
-        {shouldTruncate && !showFullDescription && (
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-gray-50 dark:from-gray-900 to-transparent pointer-events-none" />
-        )}
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        Giới thiệu sách
+      </h2>
+      
+      {/* Container của đoạn text */}
+      <div 
+        className={`text-sm text-gray-600 dark:text-gray-300 leading-7 text-justify whitespace-pre-line transition-all duration-300
+          ${isFaded ? '[mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_70%,transparent_100%)]' : ''}
+        `}
+      >
+        {displayText}
       </div>
+
       {shouldTruncate && (
         <button
           onClick={() => setShowFullDescription(!showFullDescription)}

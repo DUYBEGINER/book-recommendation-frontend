@@ -6,7 +6,7 @@ const BookActions = React.memo(({ onRead, onFavorite, onDownload, isFavorited, l
     <div className="flex flex-wrap items-center gap-3 mb-10">
       <button
         onClick={onRead}
-        className="inline-flex items-center gap-2.5 bg-primary hover:bg-primary-hover active:scale-[0.97] text-white pl-5 pr-7 py-3 rounded-full transition-all duration-200 font-semibold shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30"
+        className="inline-flex items-center gap-2.5 bg-primary hover:bg-primary-hover active:scale-[0.97] text-white pl-5 pr-7 py-3 rounded-full transition-all duration-200 font-semibold shadow-lg shadow-primary/25 hover:shadow-lg hover:shadow-primary/30"
       >
         <BookOpenText className="w-5 h-5" />
         Bắt đầu Đọc
