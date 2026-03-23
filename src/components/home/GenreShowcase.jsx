@@ -1,47 +1,30 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { getAllGenres } from "../../services/genreService";
+import useGenres from "../../hooks/useGenres";
 
 const gradients = [
-  "from-indigo-500 to-purple-500",
-  "from-teal-500 to-emerald-500",
-  "from-purple-500 to-pink-500",
-  "from-orange-500 to-red-500",
-  "from-blue-500 to-indigo-500",
-  "from-yellow-600 to-orange-500",
-  "from-pink-500 to-rose-500",
-  "from-emerald-500 to-teal-500"
+  "from-indigo-500 to-black-500",
+  "from-teal-500 to-black-500",
+  "from-purple-500 to-black-500",
+  "from-orange-500 to-black-500",
+  "from-blue-500 to-black-500",
+  "from-yellow-600 to-black-500",
+  "from-pink-500 to-black-500",
+  "from-emerald-500 to-black-500",
+  "from-black to-white",
 ];
 
 const GenreShowcase = () => {
-  const [genres, setGenres] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showNav, setShowNav] = useState(false);
   const scrollContainerRef = useRef(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchGenres = async () => {
-      try {
-        const data = await getAllGenres();
-        // Assuming data is an array of genres
-        if (Array.isArray(data)) {
-          setGenres(data);
-        } else if (data && data.content) {
-          setGenres(data.content);
-        }
-      } catch (error) {
-        console.error("Error fetching genres:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchGenres();
-  }, []);
+  const { genres, loading } = useGenres();
 
   const handleGenreClick = (genre) => {
-    navigate(`/category/${genre.genreId}?name=${encodeURIComponent(genre.genreName || genre.name)}`);
+    navigate(
+      `/category/${genre.genreId}?name=${encodeURIComponent(genre.genreName || genre.name)}`,
+    );
   };
 
   const scroll = (direction) => {
@@ -54,6 +37,16 @@ const GenreShowcase = () => {
     });
   };
 
+  // Memoize featured genres to avoid recalculating on every render
+  const featuredGenres = useMemo(() => {
+    return genres.slice(-5);
+  }, [genres]);
+
+  // Memoize remaining count
+  const remainingCount = useMemo(() => {
+    return Math.max(0, genres.length - 5);
+  }, [genres.length]);
+
   if (loading) {
     return (
       <section className="mb-12">
@@ -62,7 +55,10 @@ const GenreShowcase = () => {
         </h2>
         <div className="flex gap-4 overflow-x-hidden">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="flex-shrink-0 w-40 h-40 bg-gray-200 dark:bg-gray-800 animate-pulse rounded-xl"></div>
+            <div
+              key={i}
+              className="flex-shrink-0 w-40 h-40 bg-gray-200 dark:bg-gray-800 animate-pulse rounded-xl"
+            ></div>
           ))}
         </div>
       </section>
@@ -76,7 +72,7 @@ const GenreShowcase = () => {
       <h2 className="mb-6 text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
         Bạn đang quan tâm gì?
       </h2>
-      <div 
+      <div
         className="relative"
         onMouseEnter={() => setShowNav(true)}
         onMouseLeave={() => setShowNav(false)}
@@ -102,7 +98,7 @@ const GenreShowcase = () => {
           className="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {genres.map((genre, index) => {
+          {featuredGenres.map((genre, index) => {
             const gradient = gradients[index % gradients.length];
             return (
               <div
@@ -110,15 +106,15 @@ const GenreShowcase = () => {
                 onClick={() => handleGenreClick(genre)}
                 className={`
                   flex-shrink-0 snap-start w-40 h-40 sm:w-48 sm:h-48 rounded-xl cursor-pointer
-                  bg-gradient-to-br ${gradient} p-4 flex flex-col justify-end
+                  bg-gradient-to-br ${gradient} p-4 flex flex-col justify-center align-center
                   hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl
                   relative overflow-hidden group
                 `}
               >
                 {/* Subtle overlay for styling */}
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300" />
-                
-                <h3 className="text-white font-bold text-lg sm:text-xl mb-1 relative z-10 break-words line-clamp-2">
+
+                <h3 className=" text-white font-bold text-lg sm:text-xl mb-5 relative z-10 break-words line-clamp-2">
                   {genre.genreName || genre.name}
                 </h3>
                 <div className="flex items-center text-white/90 text-sm font-medium relative z-10 group-hover:text-white transition-colors duration-300">
@@ -127,6 +123,24 @@ const GenreShowcase = () => {
               </div>
             );
           })}
+          <div
+            className={`
+                  flex-shrink-0 snap-start w-40 h-40 sm:w-48 sm:h-48 rounded-xl cursor-pointer
+                  bg-gradient-to-br ${gradients[gradients.length - 1]} p-4 flex flex-col justify-center
+                  hover:scale-105 transition-transform duration-300 shadow-md hover:shadow-xl
+                  relative overflow-hidden group
+                `}
+          >
+            {/* Subtle overlay for styling */}
+            <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300" />
+
+            <h3 className="text-white font-bold text-lg sm:text-xl mb-1 relative z-10 break-words line-clamp-2">
+              + {remainingCount} thể loại khác
+            </h3>
+            <div className="flex items-center text-white/90 text-sm font-medium relative z-10 group-hover:text-white transition-colors duration-300">
+              Xem chủ đề <ChevronRight className="w-4 h-4 ml-1" />
+            </div>
+          </div>
         </div>
 
         {/* Right nav */}
@@ -147,4 +161,4 @@ const GenreShowcase = () => {
   );
 };
 
-export default GenreShowcase;
+export default React.memo(GenreShowcase);

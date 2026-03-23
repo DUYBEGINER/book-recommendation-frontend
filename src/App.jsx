@@ -9,8 +9,10 @@ import { useThemeContext } from "./hooks/useTheme";
 
 import BookDetail from "./pages/BookDetail";
 import CategoryBooks from "./pages/CategoryBooks";
+import Membership from "./pages/Membership";
 
 import AuthProvider from "./contexts/Auth/AuthProvider.jsx";
+import { GenreProvider } from "./contexts/Genre/GenreProvider.jsx";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 import AdminRoute from "./components/routes/AdminRoute";
 import UserRoute from "./components/routes/UserRoute";
@@ -41,22 +43,23 @@ function App() {
 
   return (
     <AuthProvider>
-      <ConfigProvider
-        theme={{
-          algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
-        }}
-      >
-        <AntdApp>
-          <Routes>
-            {/* User Routes - Admin will be redirected to /admin */}
-            <Route
-              path="/"
-              element={
-                <UserRoute>
-                  <Home />
-                </UserRoute>
-              }
-            />
+      <GenreProvider>
+        <ConfigProvider
+          theme={{
+            algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+          }}
+        >
+          <AntdApp>
+            <Routes>
+              {/* User Routes - Admin will be redirected to /admin */}
+              <Route
+                path="/"
+                element={
+                  <UserRoute>
+                    <Home />
+                  </UserRoute>
+                }
+              />
             <Route
               path={PATHS.SEARCH}
               element={
@@ -78,6 +81,14 @@ function App() {
               element={
                 <UserRoute>
                   <CategoryBooks />
+                </UserRoute>
+              }
+            />
+            <Route
+              path={PATHS.MEMBERSHIP}
+              element={
+                <UserRoute>
+                  <Membership />
                 </UserRoute>
               }
             />
@@ -176,9 +187,10 @@ function App() {
             <Route path="/activate-account" element={<ActivateAccount />} />
             <Route path="/reader" element={<EpubCoreViewer />} />
             <Route path="/upload" element={<Upload />} />
-          </Routes>
-        </AntdApp>
-      </ConfigProvider>
+            </Routes>
+          </AntdApp>
+        </ConfigProvider>
+      </GenreProvider>
     </AuthProvider>
   );
 }

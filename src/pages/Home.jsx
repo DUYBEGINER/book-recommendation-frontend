@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-} from "react";
+import React, { useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Components
@@ -12,119 +6,41 @@ import Hero from "../components/home/Hero";
 import BookCarousel from "../components/common/BookCarousel";
 import TopBooksShowcase from "../components/home/TopBooksShowcase";
 import GenreShowcase from "../components/home/GenreShowcase";
-import SectionWrapper from "../components/home/SectionWrapper";
-import PromoBanner from "../components/home/PromoBanner";
-import FeatureHighlights from "../components/home/FeatureHighlights";
-import PlatformIntro from "../components/home/PlatformIntro";
 import SideTitleBookCarousel from "../components/home/SideTitleBookCarousel";
 
 // Layout
 import MainLayout from "../layouts/MainLayout";
 
-// Services
-import { getBooksByGenre } from "../services/manageBookService";
-import { getMostReadBooks } from "../services/bookService";
+// Hooks
+import useGenreMap from "../hooks/useGenreMap";
+import useTopBooks from "../hooks/useTopBooks";
+import useLazyLoadGenres from "../hooks/useLazyLoadGenres";
 
-const DEFAULT_PAGE_SIZE = 12;
-const TOP_BOOKS_SIZE = 4;
-
-// Genre configuration - centralized and reusable
-const GENRE_CONFIG = [
-  { id: 11, name: "Tài chính", title: "TÀI CHÍNH" },
-  { id: 6, name: "Kỹ năng sống", title: "KỸ NĂNG SỐNG" },
-  { id: 9, name: "Tiểu thuyết", title: "TIỂU THUYẾT" },
-];
-
-const HIGHLIGHT_GENRE = { id: 12, name: "Tâm lí", title: "Sách tâm lí" };
+// Constants
+import {
+  MAIN_GENRE_CONFIG,
+  SIDE_GENRE_CONFIG,
+  getAllGenreIds,
+  TOP_BOOKS_SIZE,
+} from "../constants/homeGenres";
 
 const Home = () => {
   const navigate = useNavigate();
-  const [genreBooks, setGenreBooks] = useState({});
-  const [genreLoaded, setGenreLoaded] = useState({});
-  const [topBooks, setTopBooks] = useState([]);
-  const [topBooksLoading, setTopBooksLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // Refs for intersection observer - use single object
-  const genreRefs = useRef({});
-  const loadedGenresRef = useRef(new Set());
+  // Get genres with O(1) lookup map
+  const { genreMap } = useGenreMap();
 
-  // Load top books (most read)
-  useEffect(() => {
-    const controller = new AbortController();
+  // Load top books
+  const {
+    topBooks,
+    loading: topBooksLoading,
+    error,
+  } = useTopBooks(TOP_BOOKS_SIZE);
 
-    const loadTopBooks = async () => {
-      try {
-        const response = await getMostReadBooks(0, TOP_BOOKS_SIZE);
-        if (!controller.signal.aborted) {
-          setTopBooks(Array.isArray(response?.data) ? response.data : []);
-        }
-      } catch (err) {
-        if (!controller.signal.aborted) {
-          console.error("Error loading top books:", err);
-          setError("Không thể tải sách nổi bật");
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setTopBooksLoading(false);
-        }
-      }
-    };
-
-    loadTopBooks();
-    return () => controller.abort();
-  }, []);
-
-  // Load books by genre - optimized with single state update
-  const loadGenreBooks = useCallback(async (genreId) => {
-    try {
-      const response = await getBooksByGenre(genreId, {
-        page: 0,
-        size: DEFAULT_PAGE_SIZE,
-      });
-      const books = Array.isArray(response?.content) ? response.content : [];
-
-      setGenreBooks((prev) => ({ ...prev, [genreId]: books }));
-    } catch (err) {
-      console.error(`Error loading genre ${genreId}:`, err);
-      setGenreBooks((prev) => ({ ...prev, [genreId]: [] }));
-    }
-  }, []);
-
-  // Intersection Observer for lazy loading - simplified
-  useEffect(() => {
-    if (topBooksLoading) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-
-          const genreId = Number(entry.target.dataset.genreId);
-          if (loadedGenresRef.current.has(genreId)) return;
-
-          loadedGenresRef.current.add(genreId);
-          setGenreLoaded((prev) => ({ ...prev, [genreId]: true }));
-          loadGenreBooks(genreId);
-        });
-      },
-      { root: null, rootMargin: "100px", threshold: 0.1 },
-    );
-
-    // Observe all genre refs
-    Object.values(genreRefs.current).forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => observer.disconnect();
-  }, [topBooksLoading, loadGenreBooks]);
-
-  // Ref callback for genre sections
-  const setGenreRef = useCallback(
-    (genreId) => (el) => {
-      genreRefs.current[genreId] = el;
-    },
-    [],
+  // Lazy load genre books with Intersection Observer
+  const { genreBooks, genreLoaded, setGenreRef } = useLazyLoadGenres(
+    getAllGenreIds(),
+    { enabled: !topBooksLoading }
   );
 
   const handleSearchSubmit = useCallback(
@@ -134,14 +50,53 @@ const Home = () => {
         navigate(`/search?keyword=${encodeURIComponent(trimmedKeyword)}`);
       }
     },
-    [navigate],
+    [navigate]
   );
 
-  // Build interleaved sections: genre carousel -> promo section -> genre carousel -> ...
+  // Build side title sections: 3 genres in a gradient wrapper
+  const sideGenreSections = useMemo(() => {
+    const sections = SIDE_GENRE_CONFIG.map((genre) => {
+      const books = genreBooks[genre.id];
+      const isLoaded = genreLoaded[genre.id];
+      const genreData = genreMap.get(genre.id); // O(1) lookup instead of O(n) find
+
+      return (
+        <div
+          key={genre.id}
+          ref={setGenreRef(genre.id)}
+          data-genre-id={genre.id}
+          className="min-h-[100px]"
+        >
+          {isLoaded ? (
+            books?.length > 0 ? (
+              <SideTitleBookCarousel
+                books={books}
+                title={genreData?.genreName || genre.title}
+                genreId={genre.id}
+                className={genre.color}
+              />
+            ) : null
+          ) : (
+            <div className="py-16 text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400" />
+            </div>
+          )}
+        </div>
+      );
+    });
+
+    return (
+      <div className="bg-gradient-to-b from-[#282B39] to-gray-900 rounded-xl flex flex-col gap-2">
+        {sections}
+      </div>
+    );
+  }, [genreBooks, genreLoaded, setGenreRef, genreMap]);
+
+  // Build main genre carousel sections
   const genreSections = useMemo(() => {
     const sections = [];
 
-    GENRE_CONFIG.forEach((genre, index) => {
+    MAIN_GENRE_CONFIG.forEach((genre) => {
       const books = genreBooks[genre.id];
       const isLoaded = genreLoaded[genre.id];
 
@@ -176,7 +131,7 @@ const Home = () => {
               </p>
             </div>
           )}
-        </div>,
+        </div>
       );
     });
 
@@ -207,20 +162,6 @@ const Home = () => {
           </div>
         )}
 
-        {/* <SectionWrapper variant="gradient" fullWidth={true}>
-          <PromoBanner
-            heading="Khám phá thế giới tri thức"
-            subtitle="Hàng nghìn đầu sách chất lượng đang chờ bạn. Đọc miễn phí, mọi lúc, mọi nơi trên mọi thiết bị."
-            ctaText="Khám phá ngay"
-            ctaLink="/search"
-            variant="primary"
-          />
-        </SectionWrapper>
-
-                  <SectionWrapper variant="gradient" fullWidth={true}>
-          <FeatureHighlights />
-        </SectionWrapper> */}
-
         {!topBooksLoading && !error && (
           <>
             {/* Genre Showcase - User Interests */}
@@ -234,34 +175,11 @@ const Home = () => {
               />
             )}
 
-             {/* Highlight Genre - Custom Layout */}
-            <div
-              ref={setGenreRef(HIGHLIGHT_GENRE.id)}
-              data-genre-id={HIGHLIGHT_GENRE.id}
-              className="min-h-[100px] mb-12"
-            >
-              {genreLoaded[HIGHLIGHT_GENRE.id] ? (
-                genreBooks[HIGHLIGHT_GENRE.id]?.length > 0 ? (
-                  <SideTitleBookCarousel
-                    books={genreBooks[HIGHLIGHT_GENRE.id]}
-                    title={HIGHLIGHT_GENRE.title}
-                    genreId={HIGHLIGHT_GENRE.id}
-                  />
-                ) : null
-              ) : (
-                <div className="py-16 text-center">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400" />
-                  <p className="mt-4 text-gray-500 dark:text-gray-400">
-                    Đang tải {HIGHLIGHT_GENRE.name}...
-                  </p>
-                </div>
-              )}
-            </div>
+            {/* Side Title Genres Categories */}
+            {sideGenreSections}
 
             {/* Genre Carousels - Lazy Loaded */}
             {genreSections}
-
-           
           </>
         )}
       </main>

@@ -1,36 +1,17 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {useMemo} from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllGenres } from "../../services/genreService";
+import useGenres from "../../hooks/useGenres"; 
 
 const CategoryDropdown = ({ onSelect }) => {
   const navigate = useNavigate();
-  const [genres, setGenres] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
+  const { genres, isLoading } = useGenres();
   const handleCategoryClick = (category) => {
     if (onSelect) {
       onSelect(category);
       return;
     }
-
     navigate(`/category/${category.genreId}?name=${encodeURIComponent(category.genreName)}`);
   };
-
-  useEffect(() => {
-    const fetchGenres = async () => {
-      setIsLoading(true);
-      try {
-        const genres = await getAllGenres();
-        setGenres(genres);
-      } catch (error) {
-        console.error("Không thể tải danh sách thể loại:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchGenres();
-  }, []);
 
   const columns = useMemo(() => {
     if (!genres.length) {
@@ -98,4 +79,4 @@ const CategoryDropdown = ({ onSelect }) => {
   );
 };
 
-export default CategoryDropdown;
+export default React.memo(CategoryDropdown);

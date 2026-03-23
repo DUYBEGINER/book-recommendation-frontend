@@ -39,7 +39,7 @@ const MainLayout = ({
       {/* Render AuthModal có điều kiện */}
       {/* Chỉ hiển thị khi showAuthModal là true */}
       {showAuthModal && (
-        <AuthModal 
+        <AuthModal
           onClose={() => setShowAuthModal(false)} // Hàm để đóng modal
           initialMode={authMode} // Truyền chế độ ban đầu
           onModeChange={setAuthMode} // Hàm để thay đổi chế độ từ bên trong modal
@@ -47,6 +47,7 @@ const MainLayout = ({
       )}
       {!user && <ThemeToggle />}
     </div>
+
   );
 };
 

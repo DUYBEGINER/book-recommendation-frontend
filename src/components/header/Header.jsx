@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, ChevronDown, Menu, X } from 'lucide-react';
+import { Search, ChevronDown, Menu, X, Crown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CategoryDropdown from './CategoriesDropdown';
 import ProfilePopover from './ProfilePopover';
@@ -163,11 +163,19 @@ const Header = ({
                 <CategoryDropdown />
               </div>
 
+                {/* Membership */}
+                <Link
+                  to="/membership"
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
+                >
+                  <Crown className="w-4 h-4 text-yellow-500 fill-yellow-500" /> Hội viên
+                </Link>
+                
               {/* Search Bar */}
               <div className="flex-1 relative" ref={searchContainerRef}>
                 <input
                   type="text"
-                  placeholder="Tìm sách..."
+                  placeholder="Tìm sách, tác giả..."
                   value={internalSearch}
                   onChange={(e) => updateSearchValue(e.target.value)}
                   onKeyDown={handleSearchKeyDown}
@@ -256,6 +264,14 @@ const Header = ({
                 Thể loại
               </button>
 
+                <Link
+                  to="/membership"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-purple-600 dark:text-white hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-xl transition-colors"
+                >
+                  <Crown className="w-5 h-5 text-yellow-500 fill-yellow-500" /> Hội viên
+                </Link>
+                
               {!isAuthenticated ? (
                 <div className="flex gap-2 pt-1">
                   <button
