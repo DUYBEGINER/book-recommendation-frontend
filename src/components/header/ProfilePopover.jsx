@@ -76,15 +76,15 @@ const ProfilePopover = ({ user, logout }) => {
       {/* User Avatar Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-800 rounded-full transition-colors"
+        className="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
       >
-        <span className="text-sm font-medium hidden md:block">{user?.fullName || 'No Name'}</span>
+        <span className="text-sm font-medium hidden md:block text-gray-800 dark:text-gray-200">{user?.fullName || 'No Name'}</span>
         <img
           src={avatarSrc}
           alt={displayName}
-          className="w-10 h-10 rounded-full object-cover border-2 border-gray-600"
+          className="w-9 h-9 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600"
         />
-        <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-gray-600 dark:text-gray-300 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {/* Dropdown Menu */}
@@ -96,25 +96,25 @@ const ProfilePopover = ({ user, logout }) => {
             animate="visible"
             exit="exit"
             variants={panelVariants}
-            className="absolute right-0 mt-2 w-80 bg-gray-800 text-white rounded-lg shadow-xl overflow-hidden z-50 origin-top-right"
+            className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-xl shadow-xl dark:shadow-2xl border border-gray-200/80 dark:border-gray-700/60 overflow-hidden z-50 origin-top-right backdrop-blur-xl"
           >
           {/* User Info Header */}
-          <div className="p-2 border-b border-gray-700">
-            <div className="flex items-center bg-gray-900 gap-3 p-2 rounded-xl">
+          <div className="p-2 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center bg-gray-50 dark:bg-gray-900 gap-3 p-3 rounded-xl">
               <img
                 src={avatarSrc}
-                alt={displayName} 
-                className="w-16 h-16 rounded-full object-cover"
+                alt={displayName}
+                className="w-14 h-14 rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-700"
               />
-              <div>
-                <p className="font-semibold text-white">{displayName}</p>
-                <p className="text-sm text-gray-400">{email}</p>
+              <div className="min-w-0">
+                <p className="font-semibold text-gray-900 dark:text-white truncate">{displayName}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{email}</p>
               </div>
             </div>
           </div>
 
           {/* Menu Items */}
-           <motion.div className="py-2" variants={listVariants} initial="hidden" animate="visible">
+           <motion.div className="py-1.5" variants={listVariants} initial="hidden" animate="visible">
             {menuItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -122,10 +122,10 @@ const ProfilePopover = ({ user, logout }) => {
                     variants={itemVariants}
                     key={item.path}
                     onClick={() => handleMenuClick(item.path)}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-700 transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-colors text-left"
                   >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-sm">{item.label}</span>
+                  <Icon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                  <span className="text-sm text-gray-700 dark:text-gray-200">{item.label}</span>
                 </motion.button>
               );
             })}
@@ -133,11 +133,11 @@ const ProfilePopover = ({ user, logout }) => {
             {/* Dark Mode Toggle */}
             <motion.div
               variants={itemVariants}
-              className="flex items-center justify-between px-4 py-3 hover:bg-gray-700 transition-colors"
+              className="flex items-center justify-between px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700/60 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <Moon className="w-5 h-5" />
-                <span className="text-sm">Dark Mode</span>
+                <Moon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm text-gray-700 dark:text-gray-200">Dark Mode</span>
               </div>
               <div className="relative">
                 <Switch checked={theme === 'dark'} onChange={handleThemeChange} />
@@ -146,16 +146,16 @@ const ProfilePopover = ({ user, logout }) => {
            </motion.div>
 
           {/* Logout Button */}
-          <motion.div variants={itemVariants} className="border-t border-gray-700 p-2">
+          <motion.div variants={itemVariants} className="border-t border-gray-200 dark:border-gray-700 p-2">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-gray-700 rounded transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
             >
               <LogOut className="w-5 h-5" />
               <span className="text-sm font-medium">Đăng xuất</span>
             </button>
           </motion.div>
-         
+
          </motion.div>
       )}
       </AnimatePresence>

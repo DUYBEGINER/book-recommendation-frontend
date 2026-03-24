@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import { useState, useRef, useEffect, useCallback } from "react"
 import { createPortal } from "react-dom"
 import { getPreviewBook } from "../../services/bookService"
+import { applyPreset, isCloudinaryUrl } from "../../utils/cloudinaryUtils"
 
 /**
  * Calculate tooltip position relative to the trigger element.
@@ -107,6 +108,11 @@ const BookCard = ({ book, className = "", preview = true }) => {
     navigate(`/books/${book.bookId}`);
   };
 
+  // Optimize cover image URL
+  const optimizedCoverUrl = book.coverImageUrl && isCloudinaryUrl(book.coverImageUrl)
+    ? applyPreset(book.coverImageUrl, "bookCard")
+    : book.coverImageUrl;
+
   return (
     <div
       ref={cardRef}
@@ -116,12 +122,18 @@ const BookCard = ({ book, className = "", preview = true }) => {
       onMouseLeave={handleMouseLeave}
     >
       <div className="relative overflow-hidden rounded-lg shadow-md transition-transform duration-300 hover:scale-105 group">
-        <img src={book.coverImageUrl || "/placeholder.svg"} alt={book.title} className="w-full aspect-[3/4] object-cover" />
+        <img
+          src={optimizedCoverUrl || "/placeholder.svg"}
+          alt={book.title}
+          className="w-full aspect-[3/4] object-cover"
+          loading="lazy"
+          decoding="async"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
       </div>
-      <h3 className="mt-3 font-semibold text-gray-800 dark:text-white line-clamp-2 text-sm">{book.title}</h3>
-      <p className="text-xs text-gray-500 dark:text-gray-300 mt-1 flex gap-2 items-center">
-        <Pen size={14} className="flex-shrink-0" />
+      <h3 className="mt-2 sm:mt-3 font-semibold text-gray-800 dark:text-white line-clamp-2 text-xs sm:text-sm">{book.title}</h3>
+      <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-300 mt-0.5 sm:mt-1 flex gap-1.5 sm:gap-2 items-center">
+        <Pen size={12} className="flex-shrink-0 sm:w-3.5 sm:h-3.5" />
         <span className="truncate">{book.authors?.map(a => a.authorName).join(", ") || "-"}</span>
       </p>
 
@@ -142,10 +154,13 @@ const BookCard = ({ book, className = "", preview = true }) => {
           
           <div className="flex gap-4">
             {/* Book Cover */}
-            <img 
-              src={previewBook.coverImageUrl || "/placeholder.svg"} 
-              alt={previewBook.title} 
+            <img
+              src={previewBook.coverImageUrl && isCloudinaryUrl(previewBook.coverImageUrl)
+                ? applyPreset(previewBook.coverImageUrl, "bookThumbnail")
+                : (previewBook.coverImageUrl || "/placeholder.svg")}
+              alt={previewBook.title}
               className="w-24 h-32 object-cover rounded-lg shadow-md flex-shrink-0"
+              loading="lazy"
             />
             
             {/* Book Info */}

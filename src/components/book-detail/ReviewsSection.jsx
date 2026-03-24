@@ -1,6 +1,5 @@
 import React, {useState, useCallback} from 'react';
 import RatingSummary from './RatingSummary';
-import SectionHeader from '../common/SectionHeader';
 import ReviewsList from './ReviewsList';
 import ReviewModal from './ReviewModal';
 
@@ -20,16 +19,14 @@ const ReviewsSection = React.memo(({ rating, totalReviews, reviews, onLoadMore, 
             onReviewSubmit(newReview);
         }
     }, [onReviewSubmit]);
+
     return (
         <>
-        <div className="border-t border-gray-300 dark:border-gray-600 pt-8">
-        <SectionHeader title="Đánh giá & Nhận xét" />
-        <div className="grid grid-cols-1">
-            <RatingSummary rating={rating} totalReviews={totalReviews}  onWriteReview={handleWriteReview}/>
-            <ReviewsList reviews={reviews} onLoadMore={onLoadMore} hasMore={hasMore} loadingMore={loadingMore} />
+        <div className="pt-6 sm:pt-10">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">Đánh giá & Nhận xét</h2>
+          <RatingSummary rating={rating} totalReviews={totalReviews} onWriteReview={handleWriteReview} />
+          <ReviewsList reviews={reviews} onLoadMore={onLoadMore} hasMore={hasMore} loadingMore={loadingMore} />
         </div>
-        </div>
-        {/* Review Modal */}
         <ReviewModal
             isOpen={isReviewModalOpen}
             onClose={handleCloseModal}

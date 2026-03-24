@@ -24,7 +24,7 @@ const MainLayout = ({
 
 
   return (
-    <div className="min-h-screen bg-background dark:bg-gray-900 flex flex-col">
+    <div className="min-h-[calc(100vh-120px)] bg-background dark:bg-gray-900 flex flex-col">
       <Header
         onAuthClick={openAuthModal}
         user={user}
@@ -32,12 +32,14 @@ const MainLayout = ({
         onGenreSelect={onGenreSelect}
       />
       {showHero && heroContent}
-      <main className="flex-1 max-w-7xl mx-auto mt-5 w-full">{children}</main>
+      <main className={`flex-1 max-w-7xl mx-auto w-full relative z-20 ${showHero ? "-mt-20" : "mt-5"}`}>
+        {children}
+      </main>
       <Footer />
       {/* Render AuthModal có điều kiện */}
       {/* Chỉ hiển thị khi showAuthModal là true */}
       {showAuthModal && (
-        <AuthModal 
+        <AuthModal
           onClose={() => setShowAuthModal(false)} // Hàm để đóng modal
           initialMode={authMode} // Truyền chế độ ban đầu
           onModeChange={setAuthMode} // Hàm để thay đổi chế độ từ bên trong modal
@@ -45,6 +47,7 @@ const MainLayout = ({
       )}
       {!user && <ThemeToggle />}
     </div>
+
   );
 };
 

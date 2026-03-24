@@ -1,5 +1,6 @@
 import React from 'react';
-import SectionHeader from '../common/SectionHeader';
+import { useNavigate } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 import BookCard from '../common/BookCard';
 
 // Number of placeholder cards to show while data is loading.
@@ -29,20 +30,35 @@ const SkeletonCard = () => (
  *   genreName {string|null}   – Display name for the genre page navigation.
  */
 const RelatedBooks = React.memo(({ books, loading = false, genreId, genreName }) => {
-  // Render nothing when there is neither data nor an active load — this
-  // keeps the page clean when a book has no genre assignments.
+  const navigate = useNavigate();
+
   if (!loading && (!books || books.length === 0)) return null;
 
-  return (
-    <div className="container mx-auto px-4 pb-12">
-      <SectionHeader
-        title="Sách cùng thể loại"
-        subtitle={!!genreId}
-        genreId={genreId}
-        genreName={genreName}
-      />
+  const handleViewAll = () => {
+    if (genreId) {
+      navigate(`/category/${genreId}?name=${encodeURIComponent(genreName || 'Sách cùng thể loại')}`);
+    }
+  };
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+  return (
+    <div className="pb-4">
+      {/* Custom gradient header */}
+      <div className="flex items-center justify-between mb-4 sm:mb-6">
+        <h2 className="text-base sm:text-2xl font-bold bg-gradient-to-r from-primary via-white to-orange-400 bg-clip-text text-transparent">
+          Sách cùng thể loại
+        </h2>
+        {genreId && (
+          <button
+            onClick={handleViewAll}
+            className="flex items-center gap-0.5 text-xs sm:text-sm text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary transition-colors group"
+          >
+            <span>Xem tất cả</span>
+            <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-5">
         {loading
           ? Array.from({ length: SKELETON_COUNT }, (_, i) => <SkeletonCard key={i} />)
           : books.map((book) => <BookCard key={book.bookId} book={book} />)
