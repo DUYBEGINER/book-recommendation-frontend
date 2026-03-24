@@ -175,17 +175,19 @@ const BookDetail = () => {
             <div className="relative">
               {/* Desktop background - subtle blur */}
               <div className="hidden lg:block absolute inset-0 overflow-hidden pointer-events-none z-0">
-                <div
+                <img
                   className="absolute inset-0 scale-110 blur-2xl opacity-20 dark:opacity-10 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${backgroundBlurUrl})` }}
+                  src={backgroundBlurUrl}
+                  alt=""
                 />
               </div>
 
               {/* Mobile background - cover image with gradient fade (no blur) */}
               <div className="lg:hidden absolute top-0 left-0 right-0 h-70 overflow-hidden pointer-events-none z-0">
-                <div
+                <img
                   className="absolute inset-0 bg-cover bg-top"
-                  style={{ backgroundImage: `url(${backgroundMobileUrl})` }}
+                  src={backgroundMobileUrl}
+                  alt=""
                 />
                 {/* Gradient overlay - fade from top to bottom */}
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent from-10% via-gray-50/70 via-40% to-gray-50 dark:via-gray-900/70 dark:to-gray-900" />
