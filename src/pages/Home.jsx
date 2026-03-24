@@ -144,7 +144,7 @@ const Home = () => {
       heroContent={<Hero />}
       onSearchSubmit={handleSearchSubmit}
     >
-      <main className="mt-8 px-4 sm:px-6 lg:px-8 space-y-8">
+      <main className="mt-8 px-4 sm:px-6 lg:px-8 space-y-8 min-h-[calc(100vh-400px)]">
         {topBooksLoading && (
           <div className="py-16 text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />

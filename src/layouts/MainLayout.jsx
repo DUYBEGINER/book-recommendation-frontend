@@ -24,7 +24,7 @@ const MainLayout = ({
 
 
   return (
-    <div className="min-h-screen bg-background dark:bg-gray-900 flex flex-col">
+    <div className="min-h-[calc(100vh-120px)] bg-background dark:bg-gray-900 flex flex-col">
       <Header
         onAuthClick={openAuthModal}
         user={user}

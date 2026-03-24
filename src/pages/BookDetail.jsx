@@ -148,7 +148,7 @@ const BookDetail = () => {
 
         {/* Loading State */}
         {loading && (
-          <div className="flex flex-col items-center justify-center py-24">
+          <div className="flex flex-col items-center justify-center py-24 min-h-[70vh]">
             <div className="h-12 w-12 rounded-full border-4 border-gray-200 border-t-primary animate-spin" />
             <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
               Đang tải thông tin sách...
@@ -176,7 +176,7 @@ const BookDetail = () => {
               {/* Desktop background - subtle blur */}
               <div className="hidden lg:block absolute inset-0 overflow-hidden pointer-events-none z-0">
                 <img
-                  className="absolute inset-0 scale-110 blur-2xl opacity-20 dark:opacity-10 bg-cover bg-center"
+                  className="absolute w-full h-full inset-0 scale-110 blur-2xl opacity-20 dark:opacity-10 bg-cover bg-center"
                   src={backgroundBlurUrl}
                   alt=""
                 />

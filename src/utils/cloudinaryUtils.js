@@ -144,10 +144,10 @@ export const CLOUDINARY_PRESETS = {
   },
   // Background mobile (không blur, chất lượng thấp)
   backgroundMobile: {
-    width: 400,
-    quality: "auto:low",
+    width: 1100,
+    quality: "auto",
     format: "auto",
-    crop: "limit",
+    crop: "fill",
   },
   // Avatar
   avatar: {
