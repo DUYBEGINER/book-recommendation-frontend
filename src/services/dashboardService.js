@@ -10,39 +10,27 @@ const defaultParams = {
 /**
  * Fetch admin dashboard data.
  * @param {{ topRatedPage?: number, topRatedSize?: number, topFavoritedPage?: number, topFavoritedSize?: number }} params
- * @returns {{ dashboard: Object|null, message: string }}
+ * @returns {{ data: Object|null, message: string }}
  */
 export const getAdminDashboard = async (params = {}) => {
   try {
     const response = await api.get("/admin/dashboard", {
       params: { ...defaultParams, ...params },
     });
-
-    return {
-      dashboard: response.data || response || null,
-      message: "Dashboard data retrieved successfully",
-    };
+    console.log("Raw dashboard response", response.data);
+    return response;
   } catch (error) {
     console.error("Failed to fetch dashboard:", error);
-    return {
-      dashboard: null,
-      message: error.response?.data?.message || error.message || "Failed to fetch dashboard",
-    };
+    throw error;
   }
 };
 
-export const getNewUsersLast7Days = async () => {
+export const getNewUsers = async (time) => {
   try {
-    const response = await api.get("/admin/dashboard/new-users-last-7-days"); 
-    return {
-      data: response.data || null,
-      message: "New users last 7 days data retrieved successfully",
-    };
+    const response = await api.get(`/admin/dashboard/new-users?time=${time}`); 
+    return response;
   } catch (error) {
     console.error("Failed to fetch new users last 7 days data:", error);
-    return {
-      data: null,
-      message: error.response?.data?.message || error.message || "Failed to fetch new users last 7 days data",
-    };
+    throw error;
   }
 };

@@ -1,29 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
-import { message } from "antd";
+import {useMemo} from "react";
 import {useQuery} from "@tanstack/react-query";
 import AdminLayout from "../../layouts/AdminLayout";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  LabelList,
-} from "recharts";
-import {
-  Users,
-  BookOpen,
-  Layers,
-  PenSquare,
-  Star,
-  Heart,
-} from "lucide-react";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LabelList, } from "recharts";
+import { Users, BookOpen, Layers, PenSquare, Star, Heart, } from "lucide-react";
 
 import ListCard from "../../components/admin/ListCard";
 import StatCard from "../../components/admin/StatCard";
 
-import { getAdminDashboard, getNewUsersLast7Days } from "../../services/dashboardService";
+import { getAdminDashboard, getNewUsers } from "../../services/dashboardService";
+
+const TIME_RANGES = [
+  { label: "7 ngày", value: 7 },
+  { label: "30 ngày", value: 30 }
+]
 
 const formatNumber = (value) => {
   if (typeof value !== "number" || Number.isNaN(value)) {
@@ -42,66 +31,58 @@ const formatDateLabel = (dateString) => {
 };
 
 const AdminDashboard = () => {
-  const [dashboard, setDashboard] = useState(null);
-  const [newUser7Days, setNewUser7Days] = useState([]);
 
   const newUsersQuery = useQuery({
-    queryKey: ["newUsersLast7Days"],
-    queryFn: getNewUsersLast7Days,
+    queryKey: ["newUsersLast7Days", TIME_RANGES[0].value],
+    queryFn: () => getNewUsers(TIME_RANGES[0].value),
+    refetchOnWindowFocus: false, // Thêm dòng này
   });
 
   const dashboardQuery = useQuery({
     queryKey: ["dashboard"],
     queryFn: getAdminDashboard,
+     refetchOnWindowFocus: false, // Thêm dòng này
+    select: (response) => response?.data ?? {},
   });
-
-  useEffect(() => {
-    if (dashboardQuery.isError || newUsersQuery.isError) {
-      message.error("Không thể tải dữ liệu!");
-    } else if (dashboardQuery.data && newUsersQuery.data) {
-      setDashboard(dashboardQuery.data.dashboard);
-      setNewUser7Days(newUsersQuery.data.data);
-    }
-  }, [dashboardQuery.isError, dashboardQuery.data, newUsersQuery.isError, newUsersQuery.data]);
 
   const stats = useMemo(
     () => [
       {
         icon: Users,
         label: "Tổng số người đọc",
-        value: dashboard?.totalUsers ?? 0,
+        value: dashboardQuery.data?.totalUsers ?? 0,
       },
       {
         icon: BookOpen,
         label: "Tổng số sách",
-        value: dashboard?.totalBooks ?? 0,
+        value: dashboardQuery.data?.totalBooks ?? 0,
       },
       {
         icon: Layers,
         label: "Tổng số thể loại",
-        value: dashboard?.totalGenres ?? 0,
+        value: dashboardQuery.data?.totalGenres ?? 0,
       },
       {
         icon: PenSquare,
         label: "Tổng số tác giả",
-        value: dashboard?.totalAuthors ?? 0,
+        value: dashboardQuery.data?.totalAuthors ?? 0,
       },
     ],
-    [dashboard],
+    [dashboardQuery.data],
   );
 
   const chartData = useMemo(
     () =>
-      (newUser7Days ?? []).map((item) => ({
+      (newUsersQuery?.data?.data ?? []).map((item) => ({
         date: formatDateLabel(item.date),
         value: item.count ?? 0,
       })),
-    [newUser7Days],
+    [newUsersQuery.data],
   );
 
   const topRatedBooks = useMemo(
     () =>
-      (dashboard?.topRatedBooks?.content ?? []).map((book) => ({
+      (dashboardQuery.data?.topRatedBooks?.content ?? []).map((book) => ({
         id: book.id,
         title: book.title,
         subtitle: `${formatNumber(book.ratingCount ?? 0)} đánh giá`,
@@ -110,12 +91,12 @@ const AdminDashboard = () => {
           : "https://via.placeholder.com/56x56?text=Book",
         score: Number(book.averageRating ?? 0),
       })),
-    [dashboard],
+    [dashboardQuery.data],
   );
 
   const topFavoriteBooks = useMemo(
     () =>
-      (dashboard?.topFavoritedBooks?.content ?? []).map((book) => ({
+      (dashboardQuery.data?.topFavoritedBooks?.content ?? []).map((book) => ({
         id: book.id,
         title: book.title,
         subtitle: `${formatNumber(book.favoriteCount ?? 0)} lượt yêu thích`,
@@ -124,7 +105,7 @@ const AdminDashboard = () => {
           : "https://via.placeholder.com/56x56?text=Book",
         score: Number(book.favoriteCount ?? 0),
       })),
-    [dashboard],
+    [dashboardQuery.data],
   );
 
   return (

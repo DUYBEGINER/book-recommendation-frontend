@@ -116,14 +116,14 @@ const Header = ({ onAuthClick, user, onSearchSubmit }) => {
         <nav
           className={`mx-auto transition-all duration-500 ease-out ${
             isScrolled
-              ? "max-w-6xl rounded-2xl backdrop-blur-xl bg-white/75 dark:bg-gray-900/70 border border-gray-200/60 dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)]"
+              ? "max-w-7xl rounded-2xl backdrop-blur-xl bg-white/75 dark:bg-gray-900/70 border border-gray-200/60 dark:border-white/[0.08] shadow-[0_8px_32px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.35)]"
               : "max-w-full bg-white dark:bg-gray-900 shadow-sm border-b border-gray-100 dark:border-gray-800"
           }`}
         >
           <div
             className={`mx-auto flex items-center justify-between transition-all duration-500 ${
               isScrolled
-                ? "h-14 px-4 sm:px-5"
+                ? "h-14 px-4 sm:px-5 max-w-7xl"
                 : "h-16 px-4 sm:px-6 lg:px-8 max-w-7xl"
             }`}
           >
