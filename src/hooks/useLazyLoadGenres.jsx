@@ -25,7 +25,6 @@ const DEFAULT_PAGE_SIZE = 12;
  * </div>
  */
 const useLazyLoadGenres = (
-  genreIds = [],
   {
     pageSize = DEFAULT_PAGE_SIZE,
     rootMargin = "100px",

@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 // Components
 import Hero from "../components/home/Hero";
 import BookCarousel from "../components/common/BookCarousel";
-import TopBooksShowcase from "../components/home/TopBooksShowcase";
+import TopBooksShowcase, { TopBooksSkeleton } from "../components/home/TopBooksShowcase";
 import GenreShowcase from "../components/home/GenreShowcase";
 import SideTitleBookCarousel from "../components/home/SideTitleBookCarousel";
 
@@ -20,7 +20,6 @@ import useLazyLoadGenres from "../hooks/useLazyLoadGenres";
 import {
   MAIN_GENRE_CONFIG,
   SIDE_GENRE_CONFIG,
-  getAllGenreIds,
   TOP_BOOKS_SIZE,
 } from "../constants/homeGenres";
 
@@ -38,10 +37,9 @@ const Home = () => {
   } = useTopBooks(TOP_BOOKS_SIZE);
 
   // Lazy load genre books with Intersection Observer
-  const { genreBooks, genreLoaded, setGenreRef } = useLazyLoadGenres(
-    getAllGenreIds(),
-    { enabled: !topBooksLoading }
-  );
+  const { genreBooks, genreLoaded, setGenreRef } = useLazyLoadGenres({
+    enabled: !topBooksLoading,
+  });
 
   const handleSearchSubmit = useCallback(
     (keyword) => {
@@ -50,7 +48,7 @@ const Home = () => {
         navigate(`/search?keyword=${encodeURIComponent(trimmedKeyword)}`);
       }
     },
-    [navigate]
+    [navigate],
   );
 
   // Build side title sections: 3 genres in a gradient wrapper
@@ -131,7 +129,7 @@ const Home = () => {
               </p>
             </div>
           )}
-        </div>
+        </div>,
       );
     });
 
@@ -145,43 +143,23 @@ const Home = () => {
       onSearchSubmit={handleSearchSubmit}
     >
       <main className="mt-8 px-4 sm:px-6 lg:px-8 space-y-8 min-h-[calc(100vh-400px)]">
-        {topBooksLoading && (
-          <div className="py-16 text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
-            <p className="mt-4 text-gray-600 dark:text-gray-300">
-              Đang tải sách...
-            </p>
-          </div>
+        {/* Genre Showcase - User Interests */}
+        <GenreShowcase />
+
+       {!error && topBooksLoading && <TopBooksSkeleton />}
+        
+        {!error && !topBooksLoading && topBooks.length > 0 && (
+          <TopBooksShowcase
+            books={topBooks}
+            title="Top sách được đọc nhiều nhất"
+          />
         )}
 
-        {error && (
-          <div className="py-8 text-center bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-xl">
-            <p className="text-red-600 dark:text-red-300 font-medium">
-              {error}
-            </p>
-          </div>
-        )}
+        {/* Side Title Genres Categories */}
+        {sideGenreSections}
 
-        {!topBooksLoading && !error && (
-          <>
-            {/* Genre Showcase - User Interests */}
-            <GenreShowcase />
-
-            {/* Top Books Showcase - Most Read Books */}
-            {topBooks.length > 0 && (
-              <TopBooksShowcase
-                books={topBooks}
-                title="Top sách được đọc nhiều nhất"
-              />
-            )}
-
-            {/* Side Title Genres Categories */}
-            {sideGenreSections}
-
-            {/* Genre Carousels - Lazy Loaded */}
-            {genreSections}
-          </>
-        )}
+        {/* Genre Carousels - Lazy Loaded */}
+        {genreSections}
       </main>
     </MainLayout>
   );

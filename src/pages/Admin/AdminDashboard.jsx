@@ -58,7 +58,7 @@ const AdminDashboard = () => {
 
   const statsQuery = useQuery({
     queryKey: ["dashboardStats"],
-    queryFn: getDashboardStats,
+    queryFn: () => getDashboardStats(),
     refetchOnWindowFocus: false,
     staleTime:  5 * 60 * 1000, // 5 minutes
     select: (response) => response?.data ?? {},

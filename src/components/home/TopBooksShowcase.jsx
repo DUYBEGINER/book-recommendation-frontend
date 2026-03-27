@@ -12,6 +12,7 @@ import { applyPreset } from "../../utils/cloudinaryUtils.js";
  *   - Improved responsive breakpoints for optimal card sizing across devices.
  *   - Navigation buttons use local hover state instead of parent `group-hover`.
  */
+
 const TopBooksShowcase = ({ books = [], title = "Top sách nổi bật" }) => {
   const navigate = useNavigate();
   const scrollContainerRef = useRef(null);
@@ -110,100 +111,115 @@ const TopBooksShowcase = ({ books = [], title = "Top sách nổi bật" }) => {
   );
 };
 
-/**
- * BookCard — individual ranked book card with slanted clip-path.
- * Each card is a self-contained `group` to avoid hover conflicts.
- */
-const BookCard = React.memo(({ book, index, onClick, isCarousel = false }) => {
-  const slantClass = index % 2 === 0 ? "clip-slant-left" : "clip-slant-right";
+{/* Skeleton loader for TopBooksShowcase */}
+export const TopBooksSkeleton = () => {
+  const skeletonItems = [0, 1, 2, 3];
 
-  // Áp dụng tối ưu hóa kích thước + định dạng
-  const optimizedCover = book.coverImageUrl ? applyPreset(book.coverImageUrl, "bookCard") : "/placeholder-book.jpg";
-  
   return (
-    <div
-      data-book-card
-      className={`
-        flex-shrink-0 snap-start
-        ${isCarousel
-          ? "w-[70vw] xs:w-[55vw] sm:w-[45vw] md:w-[35vw] max-w-[280px]"
-          : "w-full"
-        }
-      `}
-    >
-      {/* Card — isolated group scope */}
-      <div
-        className={`
-          group relative cursor-pointer
-          bg-transparent hover:bg-[#FFD875]
-          shadow-lg hover:shadow-2xl
-          transition-shadow duration-200
-          ${slantClass}
-        `}
-        onClick={() => onClick(book.bookId)}
-      >
-        {/* Image container with scale effect */}
-        <div
-          className={`
-            relative w-full overflow-hidden
-            aspect-[3/4]
-            transition-transform duration-300 ease-out
-            group-hover:scale-[0.97]
-            ${slantClass}
-          `}
-        >
-          <img
-            src={optimizedCover}
-            alt={book.title}
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
-          {/* Hover overlay */}
-          <div
-            className="
-              absolute inset-0
-              bg-amber-300/20 opacity-0 group-hover:opacity-100
-              transition-opacity duration-200
-              pointer-events-none
-            "
-          />
-        </div>
+    <section className="mb-12">
+      <div className="h-8 w-64 bg-gray-200 dark:bg-gray-800 animate-pulse rounded mb-6"></div>
+      
+      {/* Desktop */}
+      <div className="hidden lg:grid lg:grid-cols-4 gap-4">
+        {skeletonItems.map((i) => (
+          <SkeletonCard key={`desk-${i}`} index={i} />
+        ))}
       </div>
 
-      {/* Book info */}
+      {/* Mobile/Tablet */}
+      <div className="lg:hidden flex gap-4 overflow-hidden pb-2 -mb-2">
+        {skeletonItems.map((i) => (
+          <SkeletonCard key={`mob-${i}`} index={i} isCarousel={true} />
+        ))}
+      </div>
+    </section>
+  );
+};
+
+// Reusable BookCard component with slanted clip-path and hover effects
+const BaseBookCard = ({ children, isCarousel, index, onClick }) => {
+  const slantClass = index % 2 === 0 ? "clip-slant-left" : "clip-slant-right";
+  return (
+    <div
+      className={`flex-shrink-0 snap-start ${
+        isCarousel
+          ? "w-[70vw] xs:w-[55vw] sm:w-[45vw] md:w-[35vw] max-w-[280px]"
+          : "w-full"
+      }`}
+      onClick={onClick}
+    >
+      {/* Vỏ bọc chứa slant và hover scale chung */}
+      <div className={`group relative ${slantClass} ${onClick ? 'cursor-pointer' : ''}`}>
+        {children.cover} {/* Slot cho ảnh bìa */}
+      </div>
+
       <div className="flex items-center gap-3 mt-3">
-        <span
-          className="
-            bg-[linear-gradient(39deg,rgba(254,207,89,1),rgba(255,241,204,1))]
-            bg-clip-text text-transparent
-            font-bold text-3xl sm:text-4xl
-            leading-none
-          "
-          style={{ fontFamily: "var(--font-sekuya, sans-serif)" }}
-        >
-          {index + 1}
-        </span>
+        {children.rank} {/* Slot cho Số thứ tự */}
         <div className="flex-1 min-w-0">
-          <p
-            className="
-              font-medium text-sm sm:text-base
-              text-gray-900 dark:text-white
-              truncate cursor-pointer
-              hover:text-[rgba(254,207,89,1)] transition-colors
-            "
-            onClick={() => onClick(book.bookId)}
-          >
-            {book.title}
-          </p>
-          <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-1">
-            {book.authors?.map((a) => a.authorName).join(", ") || "Không rõ tác giả"}
-          </span>
+          {children.info} {/* Slot cho Tiêu đề và Tác giả */}
         </div>
       </div>
     </div>
   );
+};
+
+/**
+ * BookCard — individual ranked book card with slanted clip-path.
+ * Each card is a self-contained `group` to avoid hover conflicts.
+ */
+const BookCard = React.memo(({ book, index, onClick, isCarousel }) => {
+  const slantClass = index % 2 === 0 ? "clip-slant-left" : "clip-slant-right";
+  // Áp dụng tối ưu hóa kích thước + định dạng
+  const optimizedCover = book.coverImageUrl ? applyPreset(book.coverImageUrl, "bookCard") : "/placeholder-book.jpg";
+  
+  return (
+    <BaseBookCard index={index} isCarousel={isCarousel} onClick={() => onClick(book.bookId)}>
+      {{
+        cover: (
+          <div className={`relative w-full overflow-hidden aspect-[3/4] transition-transform duration-300 group-hover:scale-[0.97] ${slantClass}`}>
+            <img src={optimizedCover} alt={book.title} className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-amber-300/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+          </div>
+        ),
+        rank: (
+          <span className="bg-[linear-gradient(39deg,rgba(254,207,89,1),rgba(255,241,204,1))] bg-clip-text text-transparent font-bold text-3xl sm:text-4xl">
+            {index + 1}
+          </span>
+        ),
+        info: (
+          <>
+            <p className="font-medium text-sm sm:text-base text-gray-900 dark:text-white truncate">{book.title}</p>
+            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-1">
+              {book.authors?.map(a => a.authorName).join(", ")}
+            </span>
+          </>
+        )
+      }}
+    </BaseBookCard>
+  );
 });
 
-BookCard.displayName = "BookCard";
+const SkeletonCard = ({ index, isCarousel }) => {
+  const slantClass = index % 2 === 0 ? "clip-slant-left" : "clip-slant-right";
+
+  return (
+    <BaseBookCard index={index} isCarousel={isCarousel}>
+      {{
+        cover: (
+          <div className={`w-full aspect-[3/4] bg-gray-200 dark:bg-gray-800 animate-pulse ${slantClass}`}></div>
+        ),
+        rank: (
+          <div className="w-8 h-10 bg-gray-200 dark:bg-gray-800 animate-pulse rounded"></div>
+        ),
+        info: (
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 dark:bg-gray-800 animate-pulse rounded w-3/4"></div>
+            <div className="h-3 bg-gray-200 dark:bg-gray-800 animate-pulse rounded w-1/2"></div>
+          </div>
+        )
+      }}
+    </BaseBookCard>
+  );
+};
 
 export default TopBooksShowcase;
