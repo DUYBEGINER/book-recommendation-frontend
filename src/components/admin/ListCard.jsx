@@ -1,6 +1,7 @@
 import React from "react";
 import ListItem from "./ListItem";
 import { Star, Heart } from "lucide-react";
+import Loading from "../common/Loading";
 
 const formatNumber = (value) => {
   if (typeof value !== "number" || Number.isNaN(value)) {
@@ -12,7 +13,7 @@ const formatNumber = (value) => {
 const ListCard = ({
   title,
   subtitle,
-  items,
+  items = [],
   variant = "rating",
   isLoading = false,
 }) => (
@@ -26,10 +27,10 @@ const ListCard = ({
 
     <div className="mt-3 divide-y divide-slate-200/70 dark:divide-slate-800">
       {isLoading ? (
-        <div className="py-6 text-center text-sm text-slate-500 dark:text-slate-400">
-          Đang tải dữ liệu...
+        <div className="flex items-center justify-center h-48">
+          <Loading />
         </div>
-      ) : items.length ? (
+      ) : items?.length ? (
         items.map((it) => (
           <ListItem
             key={it.id}
@@ -51,9 +52,9 @@ const ListCard = ({
           />
         ))
       ) : (
-        <div className="py-6 text-center text-sm text-slate-500 dark:text-slate-400">
-          Chưa có dữ liệu để hiển thị.
-        </div>
+        <h2 className="text-center text-slate-500 dark:text-slate-400 py-12">
+          Không có dữ liệu
+        </h2>
       )}
     </div>
   </div>

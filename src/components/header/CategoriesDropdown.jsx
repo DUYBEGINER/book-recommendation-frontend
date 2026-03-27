@@ -4,7 +4,9 @@ import useGenres from "../../hooks/useGenres";
 
 const CategoryDropdown = ({ onSelect }) => {
   const navigate = useNavigate();
+  
   const { genres, isLoading } = useGenres();
+
   const handleCategoryClick = (category) => {
     if (onSelect) {
       onSelect(category);

@@ -48,9 +48,7 @@ api.interceptors.response.use(
   (response) => response.data,
   async (error) => {
     const originalRequest = error.config;
-    // Guard: No config means network error or cancelled request
     if (!originalRequest) {
-      console.log('No original request config found, cannot attempt token refresh');
       return Promise.reject(error);
     }
 
@@ -59,7 +57,7 @@ api.interceptors.response.use(
                             originalRequest.url?.includes('/auth/register');
     const hasRetried = originalRequest._retry === true;
     const is401Error = error.response?.status === 401;
-    // Only attempt refresh for 401 errors, not retried requests, and not auth endpoints themselves
+
     if (is401Error && !hasRetried && !isAuthEndpoint) {
       
       if (isRefreshing) {
@@ -80,12 +78,15 @@ api.interceptors.response.use(
       try {
         const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {}, { withCredentials: true });
         const accessToken = response?.data?.data?.accessToken || response?.accessToken;
-        console.log('Refresh token successful, new access token received', response);
+
         if (accessToken) {
           setAuthData(accessToken);
           processQueue(null, accessToken);
           originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          return api(originalRequest);
+          // FIX: `await` ensures isRefreshing stays true until the retry completes.
+          // Without await, the finally block fires immediately, allowing new 401s
+          // from React re-renders to trigger a second (stale) refresh cycle.
+          return await api(originalRequest);
         } else {
           throw new Error("No access token received");
         }
@@ -93,7 +94,6 @@ api.interceptors.response.use(
         processQueue(err, null);
 
         if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-          axios.post(`${API_BASE_URL}/auth/logout`, {}, { withCredentials: true }).catch(() => {});
           clearAuthData();
         }
         

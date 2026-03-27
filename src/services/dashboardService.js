@@ -1,22 +1,11 @@
 import api from "../config/ApiConfig.js";
 
-const defaultParams = {
-  topRatedPage: 0,
-  topRatedSize: 5,
-  topFavoritedPage: 0,
-  topFavoritedSize: 5,
-};
-
 /**
  * Fetch admin dashboard data.
- * @param {{ topRatedPage?: number, topRatedSize?: number, topFavoritedPage?: number, topFavoritedSize?: number }} params
- * @returns {{ data: Object|null, message: string }}
  */
-export const getAdminDashboard = async (params = {}) => {
+export const getDashboardStats = async () => {
   try {
-    const response = await api.get("/admin/dashboard", {
-      params: { ...defaultParams, ...params },
-    });
+    const response = await api.get("/admin/dashboard/stats");
     console.log("Raw dashboard response", response.data);
     return response;
   } catch (error) {
@@ -25,6 +14,46 @@ export const getAdminDashboard = async (params = {}) => {
   }
 };
 
+/**
+ * 
+ * @param {{params: Object}} params
+ * @returns {{ data: Object|null, message: string }}
+ */
+export const getTopRatedBooks = async (params = {}) => {
+  try {
+    const response = await api.get("/admin/dashboard/top-rated-books", {
+      params,
+    });
+    return response;
+  } catch (error) {
+    console.error("Failed to fetch top rated books:", error);
+    throw error;
+  }
+};
+
+/**
+ * 
+ * @param {{params: Object}} params
+ * @returns {{ data: Object|null, message: string }
+ * }
+ */
+export const getTopFavoritedBooks = async (params = {}) => {
+  try {
+    const response = await api.get("/admin/dashboard/top-favorited-books", {
+      params,
+    });
+    return response;
+  } catch (error) {
+    console.error("Failed to fetch top favorited books:", error);
+    throw error;
+  }
+};
+
+/**
+ * 
+ * @param {{time: number}} time 
+ * @returns {{ data: Object|null, message: string }}
+ */
 export const getNewUsers = async (time) => {
   try {
     const response = await api.get(`/admin/dashboard/new-users?time=${time}`); 

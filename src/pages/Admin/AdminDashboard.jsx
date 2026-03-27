@@ -1,18 +1,36 @@
-import {useMemo} from "react";
-import {useQuery} from "@tanstack/react-query";
+import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import AdminLayout from "../../layouts/AdminLayout";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, LabelList, } from "recharts";
-import { Users, BookOpen, Layers, PenSquare, Star, Heart, } from "lucide-react";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  LabelList,
+} from "recharts";
+import { Users, BookOpen, Layers, PenSquare, Star, Heart } from "lucide-react";
 
 import ListCard from "../../components/admin/ListCard";
 import StatCard from "../../components/admin/StatCard";
 
-import { getAdminDashboard, getNewUsers } from "../../services/dashboardService";
+import {
+  getDashboardStats,
+  getTopRatedBooks,
+  getTopFavoritedBooks,
+  getNewUsers,
+} from "../../services/dashboardService";
 
 const TIME_RANGES = [
   { label: "7 ngày", value: 7 },
-  { label: "30 ngày", value: 30 }
-]
+  { label: "30 ngày", value: 30 },
+];
+
+const defaultParams = {
+  page: 0,
+  size: 5,
+};
 
 const formatNumber = (value) => {
   if (typeof value !== "number" || Number.isNaN(value)) {
@@ -31,17 +49,33 @@ const formatDateLabel = (dateString) => {
 };
 
 const AdminDashboard = () => {
-
   const newUsersQuery = useQuery({
     queryKey: ["newUsersLast7Days", TIME_RANGES[0].value],
     queryFn: () => getNewUsers(TIME_RANGES[0].value),
-    refetchOnWindowFocus: false, // Thêm dòng này
+    refetchOnWindowFocus: false,
+    staleTime:  5 * 60 * 1000, // 5 minutes
   });
 
-  const dashboardQuery = useQuery({
-    queryKey: ["dashboard"],
-    queryFn: getAdminDashboard,
-     refetchOnWindowFocus: false, // Thêm dòng này
+  const statsQuery = useQuery({
+    queryKey: ["dashboardStats"],
+    queryFn: getDashboardStats,
+    refetchOnWindowFocus: false,
+    staleTime:  5 * 60 * 1000, // 5 minutes
+    select: (response) => response?.data ?? {},
+  });
+
+  const topRatedBooksQuery = useQuery({
+    queryKey: ["topRatedBooks", defaultParams],
+    queryFn: () => getTopRatedBooks(defaultParams),
+    refetchOnWindowFocus: false,
+    staleTime:  5 * 60 * 1000, // 5 minutes
+    select: (response) => response?.data ?? {},
+  });
+
+  const topFavoritedBooksQuery = useQuery({
+    queryKey: ["topFavoritedBooks", defaultParams],
+    queryFn: () => getTopFavoritedBooks(defaultParams),
+    refetchOnWindowFocus: false,
     select: (response) => response?.data ?? {},
   });
 
@@ -50,25 +84,25 @@ const AdminDashboard = () => {
       {
         icon: Users,
         label: "Tổng số người đọc",
-        value: dashboardQuery.data?.totalUsers ?? 0,
+        value: statsQuery.data?.totalUsers ?? 0,
       },
       {
         icon: BookOpen,
         label: "Tổng số sách",
-        value: dashboardQuery.data?.totalBooks ?? 0,
+        value: statsQuery.data?.totalBooks ?? 0,
       },
       {
         icon: Layers,
         label: "Tổng số thể loại",
-        value: dashboardQuery.data?.totalGenres ?? 0,
+        value: statsQuery.data?.totalGenres ?? 0,
       },
       {
         icon: PenSquare,
         label: "Tổng số tác giả",
-        value: dashboardQuery.data?.totalAuthors ?? 0,
+        value: statsQuery.data?.totalAuthors ?? 0,
       },
     ],
-    [dashboardQuery.data],
+    [statsQuery.data],
   );
 
   const chartData = useMemo(
@@ -82,7 +116,7 @@ const AdminDashboard = () => {
 
   const topRatedBooks = useMemo(
     () =>
-      (dashboardQuery.data?.topRatedBooks?.content ?? []).map((book) => ({
+      (topRatedBooksQuery.data?.content ?? []).map((book) => ({
         id: book.id,
         title: book.title,
         subtitle: `${formatNumber(book.ratingCount ?? 0)} đánh giá`,
@@ -91,12 +125,12 @@ const AdminDashboard = () => {
           : "https://via.placeholder.com/56x56?text=Book",
         score: Number(book.averageRating ?? 0),
       })),
-    [dashboardQuery.data],
+    [topRatedBooksQuery.data],
   );
 
   const topFavoriteBooks = useMemo(
     () =>
-      (dashboardQuery.data?.topFavoritedBooks?.content ?? []).map((book) => ({
+      (topFavoritedBooksQuery.data?.content ?? []).map((book) => ({
         id: book.id,
         title: book.title,
         subtitle: `${formatNumber(book.favoriteCount ?? 0)} lượt yêu thích`,
@@ -105,7 +139,7 @@ const AdminDashboard = () => {
           : "https://via.placeholder.com/56x56?text=Book",
         score: Number(book.favoriteCount ?? 0),
       })),
-    [dashboardQuery.data],
+    [topFavoritedBooksQuery.data],
   );
 
   return (
@@ -124,7 +158,7 @@ const AdminDashboard = () => {
                 icon={stat.icon}
                 label={stat.label}
                 value={stat.value}
-                isLoading={dashboardQuery.isFetching}
+                isLoading={statsQuery.isFetching}
               />
             ))}
           </div>
@@ -137,7 +171,9 @@ const AdminDashboard = () => {
               <div className="h-56 md:h-64 rounded-2xl bg-[#F3F6FF] dark:bg-slate-800 p-3 md:p-4">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
-                    data={chartData.length ? chartData : [{ date: "", value: 0 }]}
+                    data={
+                      chartData.length ? chartData : [{ date: "", value: 0 }]
+                    }
                     margin={{ top: 24, right: 12, left: 8, bottom: 0 }}
                     barCategoryGap={24}
                   >
@@ -165,8 +201,19 @@ const AdminDashboard = () => {
                         <stop offset="0%" stopColor="#4AD8C7" />
                         <stop offset="100%" stopColor="#39C1B0" />
                       </linearGradient>
-                      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
-                        <feDropShadow dx="0" dy="6" stdDeviation="8" floodOpacity="0.18" />
+                      <filter
+                        id="soft"
+                        x="-20%"
+                        y="-20%"
+                        width="140%"
+                        height="140%"
+                      >
+                        <feDropShadow
+                          dx="0"
+                          dy="6"
+                          stdDeviation="8"
+                          floodOpacity="0.18"
+                        />
                       </filter>
                     </defs>
                     <Bar
@@ -193,21 +240,23 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Hàng 2: 2 bảng danh sách */}
+        {/* Row 2: 2 tables */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ListCard
-            title="Top sách được đánh giá cao"
-            subtitle="Các đầu sách được đánh giá cao nhất:"
-            items={topRatedBooks}
-            variant="rating"
-            isLoading={dashboardQuery.isFetching}
-          />
+          {/* Top Rated Books */}
+            <ListCard
+              title="Top sách được đánh giá cao"
+              subtitle="Các đầu sách được đánh giá cao nhất:"
+              items={topRatedBooks}
+              variant="rating"
+              isLoading={topRatedBooksQuery.isFetching}
+            />
+          {/* Top Favorited Books */}
           <ListCard
             title="Top sách được yêu thích nhất"
             subtitle="Các đầu sách được yêu thích nhất:"
             items={topFavoriteBooks}
             variant="favorite"
-            isLoading={dashboardQuery.isFetching}
+            isLoading={topFavoritedBooksQuery.isFetching}
           />
         </div>
       </div>
