@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { getBooksByGenre } from "../services/manageBookService";
-
+import { useQueries } from "@tanstack/react-query";
 const DEFAULT_PAGE_SIZE = 12;
 
 /**
@@ -32,48 +32,19 @@ const useLazyLoadGenres = (
     enabled = true,
   } = {}
 ) => {
-  const [genreBooks, setGenreBooks] = useState({});
-  const [genreLoaded, setGenreLoaded] = useState({});
+
+  const [intersectedGenres, setIntersectedGenres] = useState([]);
 
   const genreRefs = useRef({});
-  const loadedGenresRef = useRef(new Set());
   const observerRef = useRef(null);
 
   // Load books by genre
-  const loadGenreBooks = useCallback(
-    async (genreId) => {
-      try {
-        const response = await getBooksByGenre(genreId, {
-          page: 0,
-          size: pageSize,
-        });
-        const books = Array.isArray(response?.content) ? response.content : [];
-
-        setGenreBooks((prev) => ({ ...prev, [genreId]: books }));
-      } catch (err) {
-        console.error(`Error loading genre ${genreId}:`, err);
-        setGenreBooks((prev) => ({ ...prev, [genreId]: [] }));
-      }
-    },
-    [pageSize]
-  );
-
-  // Ref callback for genre sections
-  const setGenreRef = useCallback(
-    (genreId) => (el) => {
-      genreRefs.current[genreId] = el;
-    },
-    []
-  );
-
+ 
   // Setup Intersection Observer
   useEffect(() => {
     if (!enabled) return;
 
-    // Clean up previous observer
-    if (observerRef.current) {
-      observerRef.current.disconnect();
-    }
+    if (observerRef.current) observerRef.current.disconnect();
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -81,11 +52,13 @@ const useLazyLoadGenres = (
           if (!entry.isIntersecting) return;
 
           const genreId = Number(entry.target.dataset.genreId);
-          if (!genreId || loadedGenresRef.current.has(genreId)) return;
+          if (!genreId) return;
 
-          loadedGenresRef.current.add(genreId);
-          setGenreLoaded((prev) => ({ ...prev, [genreId]: true }));
-          loadGenreBooks(genreId);
+          // When a genre section intersects, mark it as loaded and fetch books
+          setIntersectedGenres((prev) => {
+            if (prev.includes(genreId)) return prev;
+            return [...prev, genreId];
+          });
         });
       },
       { root: null, rootMargin, threshold }
@@ -93,7 +66,7 @@ const useLazyLoadGenres = (
 
     observerRef.current = observer;
 
-    // Observe all genre refs
+    // Observe các element đã được gán ref
     Object.values(genreRefs.current).forEach((ref) => {
       if (ref) observer.observe(ref);
     });
@@ -102,13 +75,53 @@ const useLazyLoadGenres = (
       observer.disconnect();
       observerRef.current = null;
     };
-  }, [enabled, rootMargin, threshold, loadGenreBooks]);
+  }, [enabled, rootMargin, threshold]);
+
+  const setGenreRef = useCallback(
+    (genreId) => (el) => {
+      genreRefs.current[genreId] = el;
+      if (el && observerRef.current) {
+        observerRef.current.observe(el);
+      }
+    },
+    []
+  );
+
+  const genreQueries = useQueries({
+    queries: intersectedGenres.map((genreId) => ({
+      queryKey: ["genreBooks", genreId],
+      queryFn: () => getBooksByGenre(genreId, { page: 0, size: pageSize }),
+    })),
+  });
+
+  const genreBooks = useMemo(() => {
+    const booksMap = {};
+    intersectedGenres.forEach((genreId, index) => {
+      const query = genreQueries[index];
+      // Nếu đang trong trạng thái loading/pending, gán undefined để UI render Skeleton
+      if (query?.isLoading || query?.isPending) {
+        booksMap[genreId] = undefined;
+      } else {
+        const response = query?.data;
+        booksMap[genreId] = Array.isArray(response?.content) ? response.content : [];
+      }
+    });
+    return booksMap;
+  }, [intersectedGenres, genreQueries]);
+
+  const genreLoaded = useMemo(() => {
+    const loadedMap = {};
+    intersectedGenres.forEach((genreId, index) => {
+      // Coi như đã load xong khi call API thành công hoặc bị lỗi (để tắt spinner)
+      loadedMap[genreId] = genreQueries[index]?.isSuccess || genreQueries[index]?.isError;
+    });
+    return loadedMap;
+  }, [intersectedGenres, genreQueries]);
 
   return {
     genreBooks,
     genreLoaded,
     setGenreRef,
-    loadGenreBooks,
   };
 };
 
